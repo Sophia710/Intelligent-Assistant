@@ -14,18 +14,36 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ChatInput from '../components/ChatInput'
 import useConversations from '../hooks/useConversations'
+import useSkills from '../hooks/useSkills'
 
 export default function NewChatPage() {
   const navigate = useNavigate()
   const { createConversation } = useConversations()
+  const { builtinSkills, agents } = useSkills()
   const [loading, setLoading] = useState(false)
 
   // 发送消息 -> 创建新对话 -> 跳转到对话详情页
-  const handleSendMessage = async (content) => {
+  // payload: { text, files, skills, agents } - ChatInput 增强版传入
+  const handleSendMessage = async (payload) => {
+    const text = typeof payload === 'string' ? payload : payload?.text || ''
     setLoading(true)
     try {
-      const conv = await createConversation(content.trim())
-      // 跳转到新创建的对话详情页
+      // 将附加内容并入首条消息中（保持后端 createConversation 兼容性）
+      const parts = []
+      if (text) parts.push(text)
+      if (typeof payload === 'object') {
+        if (payload.agents?.length) {
+          parts.push(`[已加载智能体: ${payload.agents.map((a) => a.name).join('、')}]`)
+        }
+        if (payload.skills?.length) {
+          parts.push(`[已加载技能: ${payload.skills.map((s) => s.name).join('、')}]`)
+        }
+        if (payload.files?.length) {
+          parts.push(`[附件: ${payload.files.map((f) => f.name).join('、')}]`)
+        }
+      }
+      const merged = parts.join('\n')
+      const conv = await createConversation(merged.trim() || '(空消息)')
       navigate(`/chat/${conv.id}`)
     } catch (error) {
       console.error('创建对话失败:', error)
@@ -73,7 +91,12 @@ export default function NewChatPage() {
 
       {/* 底部固定的输入栏区域 */}
       <div className="w-full max-w-[800px] px-10 pb-6 fixed bottom-0">
-        <ChatInput onSend={handleSendMessage} disabled={loading} />
+        <ChatInput
+          onSend={handleSendMessage}
+          disabled={loading}
+          availableSkills={builtinSkills}
+          availableAgents={agents}
+        />
         <p
           className="text-[11px] text-center mt-2 transition-colors duration-200"
           style={{ color: 'var(--color-on-surface-variant)' }}

@@ -81,13 +81,13 @@ export default function AgentCenterPage() {
           className="text-2xl md:text-3xl font-bold transition-colors duration-200"
           style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--color-on-surface)' }}
         >
-          发现理想的 AI 助手
+          发现理想的卫星互联网AI助手
         </h2>
         <p
           className="text-sm max-w-2xl mx-auto transition-colors duration-200"
           style={{ color: 'var(--color-on-surface-variant)' }}
         >
-          浏览我们的智能体市场，寻找能提升您测试工作效率的专属助手。
+          浏览我们的智能体市场，寻找能提升您卫星互联网运行运维测试工作效率的专属助手。
         </p>
 
         {/* 搜索框 */}

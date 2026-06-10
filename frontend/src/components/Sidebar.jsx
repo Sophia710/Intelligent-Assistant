@@ -113,11 +113,11 @@ function Sidebar() {
           智能体中心
         </Link>
         <Link
-          to="/knowledge-base"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-200 border-l-4 ${
-            location.pathname.startsWith('/knowledge-base') ? 'font-medium' : ''
+          to="/skills"
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-colors duration-200 border-l-4 ${
+            isActiveNav('/skills') ? 'font-medium' : ''
           }`}
-          style={location.pathname.startsWith('/knowledge-base') ? {
+          style={isActiveNav('/skills') ? {
             backgroundColor: 'var(--color-surface-container-low)',
             color: 'var(--color-on-surface)',
             borderColor: 'var(--color-primary)',
@@ -125,8 +125,27 @@ function Sidebar() {
             color: 'var(--color-on-surface-variant)',
             borderColor: 'transparent',
           }}
-          onMouseEnter={(e) => { if (!location.pathname.startsWith('/knowledge-base')) e.currentTarget.style.backgroundColor = 'var(--color-surface-container-low)' }}
-          onMouseLeave={(e) => { if (!location.pathname.startsWith('/knowledge-base')) e.currentTarget.style.backgroundColor = 'transparent' }}
+          onMouseEnter={(e) => { if (!isActiveNav('/skills')) e.currentTarget.style.backgroundColor = 'var(--color-surface-container-low)' }}
+          onMouseLeave={(e) => { if (!isActiveNav('/skills')) e.currentTarget.style.backgroundColor = 'transparent' }}
+        >
+          <span className="material-symbols-outlined text-[20px]">apps</span>
+          技能中心
+        </Link>
+        <Link
+          to="/knowledge-base"
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-colors duration-200 border-l-4 ${
+            isActiveNav('/knowledge-base') ? 'font-medium' : ''
+          }`}
+          style={isActiveNav('/knowledge-base') ? {
+            backgroundColor: 'var(--color-surface-container-low)',
+            color: 'var(--color-on-surface)',
+            borderColor: 'var(--color-primary)',
+          } : {
+            color: 'var(--color-on-surface-variant)',
+            borderColor: 'transparent',
+          }}
+          onMouseEnter={(e) => { if (!isActiveNav('/knowledge-base')) e.currentTarget.style.backgroundColor = 'var(--color-surface-container-low)' }}
+          onMouseLeave={(e) => { if (!isActiveNav('/knowledge-base')) e.currentTarget.style.backgroundColor = 'transparent' }}
         >
           <span className="material-symbols-outlined text-[20px]">library_books</span>
           知识库

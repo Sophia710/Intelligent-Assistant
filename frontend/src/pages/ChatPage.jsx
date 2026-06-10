@@ -18,6 +18,7 @@ import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import ChatInput from '../components/ChatInput'
 import useMessages from '../hooks/useMessages'
+import useSkills from '../hooks/useSkills'
 
 /* 用户消息组件 */
 function UserMessage({ message }) {
@@ -882,6 +883,9 @@ export default function ChatPage() {
     loading
   } = useMessages(id)
 
+  // 加载可选技能/智能体列表
+  const { builtinSkills, agents } = useSkills()
+
   // 用于在 await 之后读取最新的 messages（必须在 messages 解构之后声明，避免 TDZ）
   const messagesRef = useRef(messages)
   useEffect(() => { messagesRef.current = messages }, [messages])
@@ -976,8 +980,10 @@ export default function ChatPage() {
   }
 
   // 处理发送消息
-  const handleSend = async (content) => {
-    await sendMessage(content)
+  const handleSend = async (payload) => {
+    // ChatInput 增强版传入 { text, files, skills, agents }
+    const text = typeof payload === 'string' ? payload : payload?.text || ''
+    await sendMessage(text)
   }
 
   // 处理反馈
@@ -1209,6 +1215,8 @@ export default function ChatPage() {
             maxWidth="max-w-[1200px]"
             streaming={isStreaming}
             onStop={handleStop}
+            availableSkills={builtinSkills}
+            availableAgents={agents}
           />
 
           <div className="text-center mt-2">

@@ -7,6 +7,7 @@ import { useTheme } from '../contexts/ThemeContext'
 const pageTitles = {
   '/chat/new': '新对话',
   '/agents': '智能体中心',
+  '/skills': '技能中心',
   '/knowledge-base': '知识库',
 }
 
