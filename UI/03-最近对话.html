@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Assistant Chat Interface</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --color-surface: #fcf9f8;
+    --color-secondary-fixed-dim: #c6c6c7;
+    --color-primary-container: #5852ff;
+    --color-on-error: #ffffff;
+    --color-inverse-surface: #313030;
+    --color-inverse-on-surface: #f3f0ef;
+    --color-on-secondary-fixed-variant: #454747;
+    --color-surface-tint: #483ff0;
+    --color-on-surface: #1c1b1b;
+    --color-on-tertiary-fixed-variant: #5417be;
+    --color-on-secondary: #ffffff;
+    --color-surface-container-highest: #e5e2e1;
+    --color-surface-container-low: #f6f3f2;
+    --color-tertiary-fixed-dim: #d0bcff;
+    --color-tertiary-container: #7c4de6;
+    --color-on-primary-fixed: #0c006a;
+    --color-on-error-container: #93000a;
+    --color-surface-dim: #dcd9d9;
+    --color-surface-container: #f0eded;
+    --color-primary-fixed: #e2dfff;
+    --color-outline-variant: #c7c4d9;
+    --color-on-tertiary-container: #f5edff;
+    --color-tertiary: #632fcc;
+    --color-secondary-container: #dcdddd;
+    --color-surface-container-high: #eae7e7;
+    --color-on-tertiary-fixed: #23005c;
+    --color-on-primary-fixed-variant: #2c18d9;
+    --color-primary: #3d32e6;
+    --color-outline: #777588;
+    --color-on-primary-container: #f2eeff;
+    --color-on-background: #1c1b1b;
+    --color-surface-variant: #e5e2e1;
+    --color-primary-fixed-dim: #c2c1ff;
+    --color-on-surface-variant: #464556;
+    --color-error-container: #ffdad6;
+    --color-on-tertiary: #ffffff;
+    --color-secondary-fixed: #e2e2e2;
+    --color-secondary: #5d5f5f;
+    --color-on-primary: #ffffff;
+    --color-inverse-primary: #c2c1ff;
+    --color-on-secondary-fixed: #1a1c1c;
+    --color-on-secondary-container: #5f6161;
+    --color-background: #fcf9f8;
+    --color-error: #ba1a1a;
+    --color-tertiary-fixed: #e9ddff;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-bright: #fcf9f8;
+  }
+
+  :root.dark {
+    --color-surface: #051424;
+    --color-secondary-fixed-dim: #7bd0ff;
+    --color-primary-container: #8682ff;
+    --color-on-error: #690005;
+    --color-inverse-surface: #d4e4fa;
+    --color-inverse-on-surface: #233143;
+    --color-on-secondary-fixed-variant: #004c69;
+    --color-surface-tint: #c3c0ff;
+    --color-on-surface: #d4e4fa;
+    --color-on-tertiary-fixed-variant: #673d00;
+    --color-on-secondary: #00354a;
+    --color-surface-container-highest: #273647;
+    --color-surface-container-low: #0d1c2d;
+    --color-tertiary-fixed-dim: #ffb869;
+    --color-tertiary-container: #cd7f0e;
+    --color-on-primary-fixed: #0f0069;
+    --color-on-error-container: #ffdad6;
+    --color-surface-dim: #051424;
+    --color-surface-container: #122131;
+    --color-primary-fixed: #e2dfff;
+    --color-outline-variant: #464554;
+    --color-on-tertiary-container: #3f2300;
+    --color-tertiary: #ffb869;
+    --color-secondary-container: #00a6e0;
+    --color-surface-container-high: #1c2b3c;
+    --color-on-tertiary-fixed: #2c1700;
+    --color-on-primary-fixed-variant: #382db9;
+    --color-primary: #c3c0ff;
+    --color-outline: #918fa0;
+    --color-on-primary-container: #190092;
+    --color-on-background: #d4e4fa;
+    --color-surface-variant: #273647;
+    --color-primary-fixed-dim: #c3c0ff;
+    --color-on-surface-variant: #c7c4d6;
+    --color-error-container: #93000a;
+    --color-on-tertiary: #482900;
+    --color-secondary-fixed: #c4e7ff;
+    --color-secondary: #7bd0ff;
+    --color-on-primary: #1e00a5;
+    --color-inverse-primary: #514ad1;
+    --color-on-secondary-fixed: #001e2c;
+    --color-on-secondary-container: #00374d;
+    --color-background: #051424;
+    --color-error: #ffb4ab;
+    --color-tertiary-fixed: #ffdcbb;
+    --color-surface-container-lowest: #010f1f;
+    --color-surface-bright: #2c3a4c;
+  }
+</style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed-dim": "var(--color-secondary-fixed-dim)",
+                      "primary-container": "var(--color-primary-container)",
+                      "on-error": "var(--color-on-error)",
+                      "inverse-surface": "var(--color-inverse-surface)",
+                      "inverse-on-surface": "var(--color-inverse-on-surface)",
+                      "on-secondary-fixed-variant": "var(--color-on-secondary-fixed-variant)",
+                      "surface-tint": "var(--color-surface-tint)",
+                      "on-surface": "var(--color-on-surface)",
+                      "on-tertiary-fixed-variant": "var(--color-on-tertiary-fixed-variant)",
+                      "on-secondary": "var(--color-on-secondary)",
+                      "surface-container-highest": "var(--color-surface-container-highest)",
+                      "surface-container-low": "var(--color-surface-container-low)",
+                      "tertiary-fixed-dim": "var(--color-tertiary-fixed-dim)",
+                      "tertiary-container": "var(--color-tertiary-container)",
+                      "on-primary-fixed": "var(--color-on-primary-fixed)",
+                      "on-error-container": "var(--color-on-error-container)",
+                      "surface-dim": "var(--color-surface-dim)",
+                      "surface-container": "var(--color-surface-container)",
+                      "surface": "var(--color-surface)",
+                      "primary-fixed": "var(--color-primary-fixed)",
+                      "outline-variant": "var(--color-outline-variant)",
+                      "on-tertiary-container": "var(--color-on-tertiary-container)",
+                      "tertiary": "var(--color-tertiary)",
+                      "secondary-container": "var(--color-secondary-container)",
+                      "surface-container-high": "var(--color-surface-container-high)",
+                      "on-tertiary-fixed": "var(--color-on-tertiary-fixed)",
+                      "on-primary-fixed-variant": "var(--color-on-primary-fixed-variant)",
+                      "primary": "var(--color-primary)",
+                      "outline": "var(--color-outline)",
+                      "on-primary-container": "var(--color-on-primary-container)",
+                      "on-background": "var(--color-on-background)",
+                      "surface-variant": "var(--color-surface-variant)",
+                      "primary-fixed-dim": "var(--color-primary-fixed-dim)",
+                      "on-surface-variant": "var(--color-on-surface-variant)",
+                      "error-container": "var(--color-error-container)",
+                      "on-tertiary": "var(--color-on-tertiary)",
+                      "secondary-fixed": "var(--color-secondary-fixed)",
+                      "secondary": "var(--color-secondary)",
+                      "on-primary": "var(--color-on-primary)",
+                      "inverse-primary": "var(--color-inverse-primary)",
+                      "on-secondary-fixed": "var(--color-on-secondary-fixed)",
+                      "on-secondary-container": "var(--color-on-secondary-container)",
+                      "background": "var(--color-background)",
+                      "error": "var(--color-error)",
+                      "tertiary-fixed": "var(--color-tertiary-fixed)",
+                      "surface-container-lowest": "var(--color-surface-container-lowest)",
+                      "surface-bright": "var(--color-surface-bright)"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xl": "2.5rem",
+                      "xs": "0.25rem",
+                      "max-chat-width": "1200px",
+                      "sidebar-width": "280px",
+                      "md": "1rem",
+                      "sm": "0.5rem",
+                      "lg": "1.5rem",
+                      "gutter": "1rem"
+              },
+              "fontFamily": {
+                      "headline-sm": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-lg": [
+                              "Plus Jakarta Sans"
+                      ]
+              },
+              "fontSize": {
+                      "headline-sm": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "26px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface h-screen overflow-hidden flex font-body-lg transition-colors duration-300">
+<!-- SideNavBar Component -->
+<aside class="hidden md:flex flex-col w-[280px] h-screen fixed left-0 top-0 bg-surface border-r border-surface-variant py-xl z-20 transition-colors duration-300">
+<!-- Header -->
+<div class="px-xl mb-xl">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" data-icon="robot_2" data-weight="fill" style='font-variation-settings: "FILL" 1;'>robot_2</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">卫星互联网<br/>运行运维智能体</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Intelligent Assistant</p>
+</div>
+</div>
+</div>
+<!-- CTA -->
+<div class="px-xl mb-lg">
+<button class="w-full flex items-center justify-center gap-sm bg-primary text-on-primary py-sm px-md rounded-lg font-headline-sm text-headline-sm hover:opacity-90 transition-opacity shadow-[0_4px_14px_0_rgba(61,50,230,0.39)] dark:shadow-[0_4px_14px_0_rgba(195,192,255,0.2)]">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                新建对话
+            </button>
+</div>
+<!-- Navigation Tabs -->
+<nav class="flex-1 overflow-y-auto no-scrollbar pb-lg flex flex-col">
+<ul class="space-y-sm">
+<li class="">
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-label-md text-label-md">智能体中心</span>
+</a>
+</li><li class="">
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="library_books">library_books</span>
+<span class="font-label-md text-label-md">知识库</span>
+</a>
+</li>
+</ul>
+<!-- Recent History Section -->
+<div class="mt-lg px-lg flex-1 flex flex-col">
+<h2 class="font-label-md text-label-md text-outline uppercase tracking-wider mb-sm px-sm">最近对话 (Recent)</h2>
+<ul class="space-y-sm flex-1 overflow-y-auto no-scrollbar"><li class=""><a class="flex items-center gap-sm px-sm py-xs rounded-md hover:bg-surface-container-low text-on-surface-variant bg-surface-container-low font-bold text-primary relative before:content-[''] before:absolute before:left-[-8px] before:top-2 before:bottom-2 before:w-1 before:bg-primary before:rounded-r-full" href="#"><span class="material-symbols-outlined text-[16px] text-primary" data-icon="history">history</span><span class="font-body-md text-body-md truncate">如何进行星地链路仿真测试？</span></a></li><li class=""><a class="flex items-center gap-sm px-sm py-xs rounded-md hover:bg-surface-container-low text-on-surface-variant" href="#"><span class="material-symbols-outlined text-[16px] text-outline" data-icon="history">history</span><span class="font-body-md text-body-md truncate">卫星切换过程中的时延分析</span></a></li><li class=""><a class="flex items-center gap-sm px-sm py-xs rounded-md hover:bg-surface-container-low text-on-surface-variant" href="#"><span class="material-symbols-outlined text-[16px] text-outline" data-icon="history">history</span><span class="font-body-md text-body-md truncate">低轨卫星星座多普勒补偿算法</span></a></li><li class=""><a class="flex items-center gap-sm px-sm py-xs rounded-md hover:bg-surface-container-low text-on-surface-variant" href="#"><span class="material-symbols-outlined text-[16px] text-outline" data-icon="history">history</span><span class="font-body-md text-body-md truncate">卫星信道模型参数配置</span></a></li><li class=""><a class="flex items-center gap-sm px-sm py-xs rounded-md hover:bg-surface-container-low text-on-surface-variant" href="#"><span class="material-symbols-outlined text-[16px] text-outline" data-icon="history">history</span><span class="font-body-md text-body-md truncate">终端接入认证流程优化</span></a></li></ul>
+</div>
+</nav>
+<!-- Bottom Settings (from tabs) -->
+<div class="mt-auto">
+<ul>
+<li class="">
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">设置</span>
+</a>
+</li>
+</ul>
+<!-- User Profile mini -->
+<div class="px-xl mt-sm flex items-center gap-md pb-md">
+<img alt="User profile" class="w-8 h-8 rounded-full border border-surface-variant" data-alt="A small circular portrait photo of a young man with glasses, neutral expression, light background. Minimalist styling." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1A-kkR7AhFi4-TbrSt16jPj-la1Y22aIb8p3pWmktfdYNc8skSH7SyaRL9A_Yc5_pvujVE4LdOY2nwUrPpQEfyRJPlefu1jwr_teJ9hZ8VGKM9kzpsOPbiJAE1MSr8N9XWiWhWvaQjTsoAAxs1I1oe04gj125rwFnmCaVRnkwXN6uaZujlrxy76tMNl2oq477LqTw4cM8r6arAuxuoOS4Z7kU6tYhpwHlHjASp5FrmdemH_qj4wggsSFBi5RVJ4uSCP433krWMUo"/>
+<span class="font-label-md text-label-md text-on-surface font-medium truncate">用户名称</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col md:ml-[280px] h-screen bg-surface relative transition-colors duration-300">
+<!-- TopAppBar Component -->
+<header class="flex justify-between items-center h-16 px-xl bg-surface/80 backdrop-blur-md fixed top-0 right-0 left-0 md:left-[280px] z-10 border-b border-surface-variant/50 transition-colors duration-300">
+<div class="flex items-center gap-md">
+<!-- Mobile menu toggle -->
+<button class="md:hidden text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<div class="font-headline-sm text-headline-sm font-bold text-primary">如何进行星地链路仿真测试</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors" id="theme-toggle">
+<span class="material-symbols-outlined" id="theme-icon">dark_mode</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+</header>
+<!-- Chat Stream Area -->
+<div class="flex-1 overflow-y-auto pt-[80px] pb-[120px] px-md md:px-xl flex flex-col items-center no-scrollbar">
+<div class="w-full max-w-[1200px] flex flex-col gap-lg">
+<!-- Date divider -->
+<div class="text-center my-md">
+<span class="font-label-md text-label-md text-outline bg-surface px-sm transition-colors duration-300">今天</span>
+</div>
+<!-- AI Message -->
+<div class="flex gap-md max-w-[85%] self-start">
+<div class="w-8 h-8 rounded-full bg-primary-container flex-shrink-0 flex items-center justify-center text-on-primary-container mt-1 transition-colors duration-300">
+<span class="material-symbols-outlined text-[18px]" data-icon="robot_2" data-weight="fill" style='font-variation-settings: "FILL" 1;'>robot_2</span>
+</div>
+<div class="bg-surface-container-low text-on-surface rounded-2xl rounded-tl-sm px-lg py-md border border-surface-variant/50 transition-colors duration-300">
+<p class="font-body-md text-body-md whitespace-pre-wrap">你好！我是测试用例生成数字专家。今天我能为你做点什么？你可以让我帮你生成测试用例、分析代码，或者只是聊聊天。</p>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex gap-md max-w-[85%] self-end flex-row-reverse">
+<img alt="User avatar" class="w-8 h-8 rounded-full flex-shrink-0 mt-1 border border-surface-variant" data-alt="A small circular portrait photo of a young man with glasses, neutral expression, light background. Minimalist styling." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDA4pEbaoJK3mvgzMOWLrdOnvW1dRSNXF0RzIjzvdgevjdyvWRVCNfGimzjTll4sAfkwHgYf7stdPwdnWbeThidIk5PriuIGWbYhifdhMYSH_dBZ-BnhPJ4wz-xCfuLfjknbThqUbuXDpQcAEADLHuVL0t_zplxeridTyElkyQtPTsgEYxxVSJkuNRv3cRLp03kgDmojr6BwOfGuQ3a4jcSXmw93qUKCW7c2SxJDDWH7pkOwDQjAyxPUTCUxAC8Hot-mrM19IPzRHs"/>
+<div class="bg-primary text-on-primary rounded-2xl rounded-tr-sm px-lg py-md shadow-[0_4px_14px_0_rgba(61,50,230,0.15)] dark:shadow-[0_4px_14px_0_rgba(195,192,255,0.1)] transition-colors duration-300">
+<p class="font-body-md text-body-md whitespace-pre-wrap">能帮我写一段 Python 代码来模拟低轨卫星链路的时延抖动，并生成一张测试效果的可视化图吗？</p>
+</div>
+</div>
+<!-- AI Message (Complex/Code) -->
+<div class="flex gap-md max-w-[85%] self-start w-full">
+<div class="w-8 h-8 rounded-full bg-primary-container flex-shrink-0 flex items-center justify-center text-on-primary-container mt-1 transition-colors duration-300">
+<span class="material-symbols-outlined text-[18px]" data-icon="robot_2" data-weight="fill" style='font-variation-settings: "FILL" 1;'>robot_2</span>
+</div>
+<div class="bg-surface-container-low text-on-surface rounded-2xl rounded-tl-sm px-lg py-md border border-surface-variant/50 w-full max-w-[1000px] transition-colors duration-300">
+<p class="font-body-md text-body-md mb-md">当然可以。针对卫星互联网测试，模拟链路不稳定性是关键。以下是一个使用 Python 模拟时延抖动（Jitter）的代码示例，并附带了生成的卫星测试链路可视化参考图。</p>
+<!-- Code Block -->
+<div class="bg-on-surface rounded-lg overflow-hidden my-sm shadow-sm transition-colors duration-300">
+<div class="bg-inverse-surface px-md py-xs flex justify-between items-center text-inverse-on-surface transition-colors duration-300">
+<span class="font-label-md text-label-md text-outline-variant">python</span>
+<button class="text-outline-variant hover:text-inverse-on-surface transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="content_copy">content_copy</span>
+<span class="font-label-md text-[10px]">复制代码</span>
+</button>
+</div>
+<pre class="p-md text-surface-container font-mono text-sm overflow-x-auto transition-colors duration-300"><code>import numpy as np
+import matplotlib.pyplot as plt
+
+def simulate_leo_jitter(duration_sec=60, base_latency_ms=25, jitter_amplitude=5):
+    # 模拟 60 秒的卫星链路测试数据
+    timestamps = np.linspace(0, duration_sec, 600)
+    # 使用正弦波模拟轨道变化，并加入正态分布的抖动
+    orbital_trend = base_latency_ms + 2 * np.sin(0.1 * timestamps)
+    jitter = np.random.normal(0, jitter_amplitude, len(timestamps))
+    
+    latency_data = orbital_trend + jitter
+    
+    # 生成可视化图表
+    plt.figure(figsize=(10, 4))
+    plt.plot(timestamps, latency_data, color='#3d32e6', label='Link Latency (ms)')
+    plt.axhline(y=base_latency_ms, color='#ba1a1a', linestyle='--', label='Target Base Latency')
+    plt.title('LEO Satellite Link Jitter Simulation')
+    plt.xlabel('Time (seconds)')
+    plt.ylabel('Latency (ms)')
+    plt.grid(alpha=0.3)
+    plt.legend()
+    plt.show()
+    
+    return latency_data
+
+# 执行仿真测试
+test_results = simulate_leo_jitter()</code></pre>
+</div><div class="my-md">
+<img alt="Satellite Connectivity Test" class="w-full rounded-lg border border-surface-variant transition-colors duration-300" src="https://lh3.googleusercontent.com/aida/AP1WRLue3o677Gu3R4dNAIUvMeDigaDjpm4lMim_MUKtBKKW1NtQ71Z03P7u8bN1ZnXnX84AUXLLC5IwMmD6O02TZXL6ZdICf60PgIsjAGqYYgRZrAfbk86S5m4jBpf2kz35UKcQfLSXHokdLo8jw8iDjBL0vq6bR8OdSH8yVVIdIo0Mupv83d8Dn8flUGKGdKd0AD9INouyDLjf0woBhZI4Dl47qyF5O0bEwJjW9D3A8_5D2mfNm63_eJBvBA"/>
+<p class="text-center font-label-md text-outline mt-sm">AI 生成的卫星互联网测试链路仿真图</p>
+</div>
+<p class="font-body-md text-body-md mt-md">此代码使用 <code>numpy</code> 进行数据处理并使用 <code>matplotlib</code> 生成波形图。仿真结果显示了在基准时延 25ms 波动范围内的动态表现，这对于评估终端在信道条件变化时的稳健性非常有帮助。</p>
+<!-- Action buttons for AI response -->
+<div class="flex items-center gap-sm mt-md pt-sm border-t border-surface-variant/50 transition-colors duration-300">
+<button class="text-outline hover:text-primary transition-colors p-xs rounded hover:bg-surface-container"><span class="material-symbols-outlined text-[18px]" data-icon="thumb_up">thumb_up</span></button>
+<button class="text-outline hover:text-error transition-colors p-xs rounded hover:bg-surface-container"><span class="material-symbols-outlined text-[18px]" data-icon="thumb_down">thumb_down</span></button>
+<button class="text-outline hover:text-primary transition-colors p-xs rounded hover:bg-surface-container ml-auto flex items-center gap-xs"><span class="material-symbols-outlined text-[18px]" data-icon="refresh">refresh</span><span class="font-label-md text-label-md">重新生成</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Chat Input Area (Floating) -->
+<div class="absolute bottom-0 left-0 right-0 p-md md:p-xl bg-gradient-to-t from-surface via-surface to-transparent pt-xl flex justify-center transition-colors duration-300">
+<div class="w-full max-w-[1200px] relative">
+<!-- Floating suggestions (optional) -->
+<div class="absolute -top-12 left-0 flex gap-sm overflow-x-auto no-scrollbar w-full pb-sm px-1"><button class="whitespace-nowrap bg-surface border border-surface-variant text-on-surface-variant font-label-md text-label-md px-md py-xs rounded-full hover:bg-surface-container-low transition-colors shadow-sm">导出测试数据</button><button class="whitespace-nowrap bg-surface border border-surface-variant text-on-surface-variant font-label-md text-label-md px-md py-xs rounded-full hover:bg-surface-container-low transition-colors shadow-sm">调整仿真频率</button><button class="whitespace-nowrap bg-surface border border-surface-variant text-on-surface-variant font-label-md text-label-md px-md py-xs rounded-full hover:bg-surface-container-low transition-colors shadow-sm">分析丢包率</button></div>
+<div class="bg-surface rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.2)] border border-surface-variant flex items-center p-sm pr-xs relative transition-colors duration-300">
+<button class="p-sm text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-body-md font-body-md text-on-surface placeholder:text-on-surface-variant px-md h-full outline-none" placeholder="输入消息给数字专家..." type="text"/>
+<div class="flex items-center gap-xs">
+<button class="p-sm text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low hidden sm:block">
+<span class="material-symbols-outlined text-[20px]">mic</span>
+</button>
+<button class="bg-primary text-on-primary w-10 h-10 rounded-full flex items-center justify-center hover:bg-primary/90 transition-colors ml-sm shadow-sm flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</div>
+<div class="text-center mt-xs">
+<span class="text-[11px] text-center text-on-surface-variant mt-sm" data-stitch-orig-opacity="0">AI 可能会产生不准确信息，请核实重要内容。</span>
+</div>
+</div>
+</div>
+</main>
+<script>
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeIconSpan = document.getElementById('theme-icon');
+    
+    themeToggleBtn.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        if (document.documentElement.classList.contains('dark')) {
+            themeIconSpan.textContent = 'light_mode';
+        } else {
+            themeIconSpan.textContent = 'dark_mode';
+        }
+    });
+</script>
+</body></html>

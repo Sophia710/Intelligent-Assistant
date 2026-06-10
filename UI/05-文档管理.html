@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+
+<html class="" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>知识库管理 - AI Workbench</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style id="theme-vars">
+    :root {
+        --color-on-secondary-container: #5f6161;
+        --color-on-primary-container: #f2eeff;
+        --color-secondary-fixed: #e2e2e2;
+        --color-surface-container-lowest: #ffffff;
+        --color-surface: #fcf9f8;
+        --color-surface-tint: #483ff0;
+        --color-on-secondary-fixed: #1a1c1c;
+        --color-on-surface-variant: #464556;
+        --color-on-error: #ffffff;
+        --color-secondary: #5d5f5f;
+        --color-tertiary-fixed-dim: #d0bcff;
+        --color-primary-fixed-dim: #c2c1ff;
+        --color-surface-container-low: #f6f3f2;
+        --color-surface-container-highest: #e5e2e1;
+        --color-primary-container: #5852ff;
+        --color-tertiary-fixed: #e9ddff;
+        --color-surface-bright: #fcf9f8;
+        --color-on-primary-fixed-variant: #2c18d9;
+        --color-on-primary: #ffffff;
+        --color-on-secondary: #ffffff;
+        --color-primary-fixed: #e2dfff;
+        --color-tertiary-container: #7c4de6;
+        --color-outline: #777588;
+        --color-on-tertiary: #ffffff;
+        --color-surface-variant: #e5e2e1;
+        --color-surface-container: #f0eded;
+        --color-on-tertiary-fixed-variant: #5417be;
+        --color-on-tertiary-fixed: #23005c;
+        --color-background: #fcf9f8;
+        --color-inverse-surface: #313030;
+        --color-on-surface: #1c1b1b;
+        --color-on-background: #1c1b1b;
+        --color-inverse-on-surface: #f3f0ef;
+        --color-error-container: #ffdad6;
+        --color-tertiary: #632fcc;
+        --color-on-secondary-fixed-variant: #454747;
+        --color-error: #ba1a1a;
+        --color-primary: #3d32e6;
+        --color-secondary-container: #dcdddd;
+        --color-inverse-primary: #c2c1ff;
+        --color-surface-container-high: #eae7e7;
+        --color-on-primary-fixed: #0c006a;
+        --color-secondary-fixed-dim: #c6c6c7;
+        --color-on-error-container: #93000a;
+        --color-outline-variant: #c7c4d9;
+        --color-on-tertiary-container: #f5edff;
+        --color-surface-dim: #dcd9d9;
+    }
+    .dark {
+        --color-surface: #051424;
+        --color-on-secondary-fixed-variant: #004c69;
+        --color-secondary-fixed-dim: #7bd0ff;
+        --color-on-tertiary-fixed-variant: #673d00;
+        --color-on-tertiary: #482900;
+        --color-secondary-container: #00a6e0;
+        --color-on-tertiary-fixed: #2c1700;
+        --color-tertiary-fixed: #ffdcbb;
+        --color-on-surface: #d4e4fa;
+        --color-surface-variant: #273647;
+        --color-on-secondary-fixed: #001e2c;
+        --color-surface-dim: #051424;
+        --color-primary-fixed: #e2dfff;
+        --color-surface-container-lowest: #010f1f;
+        --color-surface-tint: #c3c0ff;
+        --color-primary: #c3c0ff;
+        --color-secondary-fixed: #c4e7ff;
+        --color-on-primary: #1e00a5;
+        --color-secondary: #7bd0ff;
+        --color-tertiary-container: #cd7f0e;
+        --color-inverse-primary: #514ad1;
+        --color-error: #ffb4ab;
+        --color-primary-container: #8682ff;
+        --color-background: #051424;
+        --color-surface-container-low: #0d1c2d;
+        --color-primary-fixed-dim: #c3c0ff;
+        --color-surface-container-highest: #273647;
+        --color-outline: #918fa0;
+        --color-inverse-surface: #d4e4fa;
+        --color-on-tertiary-container: #3f2300;
+        --color-on-error-container: #ffdad6;
+        --color-outline-variant: #464554;
+        --color-tertiary: #ffb869;
+        --color-on-primary-fixed: #0f0069;
+        --color-on-primary-fixed-variant: #382db9;
+        --color-error-container: #93000a;
+        --color-on-background: #d4e4fa;
+        --color-surface-bright: #2c3a4c;
+        --color-surface-container-high: #1c2b3c;
+        --color-on-primary-container: #190092;
+        --color-on-error: #690005;
+        --color-on-secondary: #00354a;
+        --color-inverse-on-surface: #233143;
+        --color-on-secondary-container: #00374d;
+        --color-on-surface-variant: #c7c4d6;
+        --color-tertiary-fixed-dim: #ffb869;
+        --color-surface-container: #122131;
+    }
+</style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-container": "var(--color-on-secondary-container)",
+                        "on-primary-container": "var(--color-on-primary-container)",
+                        "secondary-fixed": "var(--color-secondary-fixed)",
+                        "surface-container-lowest": "var(--color-surface-container-lowest)",
+                        "surface": "var(--color-surface)",
+                        "surface-tint": "var(--color-surface-tint)",
+                        "on-secondary-fixed": "var(--color-on-secondary-fixed)",
+                        "on-surface-variant": "var(--color-on-surface-variant)",
+                        "on-error": "var(--color-on-error)",
+                        "secondary": "var(--color-secondary)",
+                        "tertiary-fixed-dim": "var(--color-tertiary-fixed-dim)",
+                        "primary-fixed-dim": "var(--color-primary-fixed-dim)",
+                        "surface-container-low": "var(--color-surface-container-low)",
+                        "surface-container-highest": "var(--color-surface-container-highest)",
+                        "primary-container": "var(--color-primary-container)",
+                        "tertiary-fixed": "var(--color-tertiary-fixed)",
+                        "surface-bright": "var(--color-surface-bright)",
+                        "on-primary-fixed-variant": "var(--color-on-primary-fixed-variant)",
+                        "on-primary": "var(--color-on-primary)",
+                        "on-secondary": "var(--color-on-secondary)",
+                        "primary-fixed": "var(--color-primary-fixed)",
+                        "tertiary-container": "var(--color-tertiary-container)",
+                        "outline": "var(--color-outline)",
+                        "on-tertiary": "var(--color-on-tertiary)",
+                        "surface-variant": "var(--color-surface-variant)",
+                        "surface-container": "var(--color-surface-container)",
+                        "on-tertiary-fixed-variant": "var(--color-on-tertiary-fixed-variant)",
+                        "on-tertiary-fixed": "var(--color-on-tertiary-fixed)",
+                        "background": "var(--color-background)",
+                        "inverse-surface": "var(--color-inverse-surface)",
+                        "on-surface": "var(--color-on-surface)",
+                        "on-background": "var(--color-on-background)",
+                        "inverse-on-surface": "var(--color-inverse-on-surface)",
+                        "error-container": "var(--color-error-container)",
+                        "tertiary": "var(--color-tertiary)",
+                        "on-secondary-fixed-variant": "var(--color-on-secondary-fixed-variant)",
+                        "error": "var(--color-error)",
+                        "primary": "var(--color-primary)",
+                        "secondary-container": "var(--color-secondary-container)",
+                        "inverse-primary": "var(--color-inverse-primary)",
+                        "surface-container-high": "var(--color-surface-container-high)",
+                        "on-primary-fixed": "var(--color-on-primary-fixed)",
+                        "secondary-fixed-dim": "var(--color-secondary-fixed-dim)",
+                        "on-error-container": "var(--color-on-error-container)",
+                        "outline-variant": "var(--color-outline-variant)",
+                        "on-tertiary-container": "var(--color-on-tertiary-container)",
+                        "surface-dim": "var(--color-surface-dim)"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "2.5rem",
+                        "gutter": "1rem",
+                        "sm": "0.5rem",
+                        "max-chat-width": "800px",
+                        "xs": "0.25rem",
+                        "sidebar-width": "280px",
+                        "md": "1rem",
+                        "lg": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["26px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["18px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "body-lg": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-card { background: rgba(var(--color-surface-container-lowest), 0.7); backdrop-filter: blur(12px); border: 1px solid var(--color-surface-variant); }
+        .dark .glass-card { background: rgba(1, 15, 31, 0.7); border: 1px solid #273647; }
+        .custom-shadow { box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.04); }
+        .sidebar-active-pill { position: relative; }
+        .sidebar-active-pill::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            bottom: 0.5rem;
+            width: 4px;
+            background-color: var(--color-primary);
+            border-top-right-radius: 9999px;
+            border-bottom-right-radius: 9999px;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--color-surface-variant); border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex min-h-screen transition-colors duration-200">
+<!-- Sidebar Navigation -->
+<nav class="hidden md:flex bg-surface dark:bg-surface-dim border-r border-surface-variant dark:border-outline-variant w-[280px] h-screen fixed left-0 top-0 flex-col py-xl z-20">
+<!-- Header -->
+<div class="px-xl mb-lg"><div class="flex items-center gap-md"><div class="w-10 h-10 shrink-0 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container"><span class="material-symbols-outlined" data-icon="robot_2" data-weight="fill" style="font-variation-settings: 'FILL' 1;">robot_2</span></div><div><h1 class="font-headline-md text-headline-md font-bold text-primary whitespace-nowrap">卫星互联网<div class="">数字专家</div></h1><p class="font-label-md text-label-md text-on-surface-variant">Intelligent Assistant</p></div></div></div>
+<!-- CTA -->
+<div class="px-xl mb-lg">
+<button class="w-full flex items-center justify-center gap-sm bg-primary text-on-primary py-sm px-md rounded-lg font-headline-sm text-headline-sm hover:opacity-90 transition-opacity shadow-[0_4px_14px_0_rgba(61,50,230,0.39)] dark:shadow-none"><span class="material-symbols-outlined" data-icon="add">add</span>新建对话</button>
+</div>
+<!-- Navigation Links -->
+<div class="px-md mb-md">
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 rounded-lg scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-label-md text-label-md">智能体中心</span>
+</a>
+<!-- Knowledge Base (ACTIVE) -->
+<a class="relative bg-surface-container dark:bg-surface-container-high text-primary dark:text-primary-fixed font-bold before:content-[''] before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1 before:bg-primary before:rounded-r-full flex items-center gap-md px-lg py-md hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 rounded-lg scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="library_books" data-weight="fill" style='font-variation-settings: "FILL" 1;'>library_books</span>
+<span class="font-label-md text-label-md">知识库</span>
+</a>
+</div>
+<!-- Recent Chat History -->
+<div class="flex-1 overflow-y-auto px-md"><div class="mt-lg px-lg flex-1 flex flex-col"><h2 class="font-label-md text-label-md text-outline uppercase tracking-wider mb-sm px-sm">最近对话 (RECENT)</h2><ul class="space-y-sm flex-1 overflow-y-auto no-scrollbar"><li class=""><a class="flex items-center gap-sm px-sm py-xs rounded-md hover:bg-surface-container-low text-on-surface-variant" href="#"><span class="material-symbols-outlined text-[16px] text-outline" data-icon="history">history</span><span class="font-body-md text-body-md truncate">如何进行星地链路仿真测试？</span></a></li><li class=""><a class="flex items-center gap-sm px-sm py-xs rounded-md hover:bg-surface-container-low text-on-surface-variant" href="#"><span class="material-symbols-outlined text-[16px] text-outline" data-icon="history">history</span><span class="font-body-md text-body-md truncate">卫星切换过程中的时延分析</span></a></li><li class=""><a class="flex items-center gap-sm px-sm py-xs rounded-md hover:bg-surface-container-low text-on-surface-variant" href="#"><span class="material-symbols-outlined text-[16px] text-outline" data-icon="history">history</span><span class="font-body-md text-body-md truncate">低轨卫星星座多普勒补偿算法</span></a></li><li class=""><a class="flex items-center gap-sm px-sm py-xs rounded-md hover:bg-surface-container-low text-on-surface-variant" href="#"><span class="material-symbols-outlined text-[16px] text-outline" data-icon="history">history</span><span class="font-body-md text-body-md truncate">卫星信道模型参数配置</span></a></li><li class=""><a class="flex items-center gap-sm px-sm py-xs rounded-md hover:bg-surface-container-low text-on-surface-variant" href="#"><span class="material-symbols-outlined text-[16px] text-outline" data-icon="history">history</span><span class="font-body-md text-body-md truncate">终端接入认证流程优化</span></a></li></ul></div></div>
+<!-- Bottom Profile Area -->
+<div class="mt-auto"><ul><li class=""><a class="flex items-center gap-md px-lg py-md text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200" href="#"><span class="material-symbols-outlined" data-icon="settings">settings</span><span class="font-label-md text-label-md">设置</span></a></li></ul><div class="px-xl mt-sm flex items-center gap-md pb-md"><img alt="User profile" class="w-8 h-8 rounded-full border border-surface-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1A-kkR7AhFi4-TbrSt16jPj-la1Y22aIb8p3pWmktfdYNc8skSH7SyaRL9A_Yc5_pvujVE4LdOY2nwUrPpQEfyRJPlefu1jwr_teJ9hZ8VGKM9kzpsOPbiJAE1MSr8N9XWiWhWvaQjTsoAAxs1I1oe04gj125rwFnmCaVRnkwXN6uaZujlrxy76tMNl2oq477LqTw4cM8r6arAuxuoOS4Z7kU6tYhpwHlHjASp5FrmdemH_qj4wggsSFBi5RVJ4uSCP433krWMUo"/><span class="font-label-md text-label-md text-on-surface font-medium truncate">Alex Chen</span></div></div></nav>
+<!-- Top App Bar -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md border-b border-surface-variant/50 dark:border-outline-variant/50 fixed top-0 right-0 left-0 md:left-[280px] z-10 flex justify-between items-center h-16 px-xl">
+<div class="flex items-center gap-sm"><button class="md:hidden text-on-surface-variant mr-sm"><span class="material-symbols-outlined">menu</span></button><nav class="flex items-center gap-xs text-label-md font-medium text-on-surface-variant"><span class="hover:text-primary cursor-pointer">知识库</span><span class="material-symbols-outlined text-[16px]">chevron_right</span><span class="text-on-surface font-bold">协议规范</span></nav></div>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant dark:text-on-secondary-container hover:text-primary dark:hover:text-primary-fixed transition-colors" onclick="toggleTheme()">
+<span class="material-symbols-outlined" id="themeIcon">dark_mode</span>
+</button>
+<button class="text-on-surface-variant dark:text-on-secondary-container hover:text-primary dark:hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant dark:text-on-secondary-container hover:text-primary dark:hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-sidebar-width min-w-0 flex flex-col min-h-screen pt-24 pb-xl px-md md:px-xl max-w-[1600px] mx-auto w-full">
+<!-- Header Actions -->
+<section class="flex flex-col md:flex-row justify-between items-start md:items-center gap-lg">
+<div>
+<button class="flex items-center gap-xs text-primary font-label-md mb-xs hover:underline"><span class="material-symbols-outlined text-[18px]">arrow_back</span>返回列表</button><h2 class="font-headline-lg text-headline-lg text-on-surface">协议规范</h2>
+</div>
+<div class="flex items-center gap-md w-full md:w-auto">
+<div class="relative flex-1 md:w-80">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-surface-variant rounded-lg font-body-md focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all text-on-surface placeholder:text-on-surface-variant" placeholder="搜索文件名或关键字..." type="text"/>
+</div>
+<button class="flex items-center gap-sm bg-primary text-on-primary px-lg py-2.5 rounded-lg font-label-md hover:shadow-lg transition-all active:scale-[0.98]" onclick="toggleModal('uploadModal')">
+<span class="material-symbols-outlined text-[20px]">upload_file</span>
+                    上传文件
+                </button>
+</div>
+</section>
+<!-- Statistics Grid -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-lg">
+<div class="glass-card p-lg rounded-xl custom-shadow flex items-start gap-lg hover:border-primary/30 transition-colors">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-secondary-container">总文档数</p>
+<p class="font-headline-md text-headline-md mt-1">128</p>
+</div>
+</div>
+<div class="glass-card p-lg rounded-xl custom-shadow flex items-start gap-lg hover:border-primary/30 transition-colors">
+<div class="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center text-green-600">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-secondary-container">解析成功</p>
+<p class="font-headline-md text-headline-md mt-1">112</p>
+</div>
+</div>
+<div class="glass-card p-lg rounded-xl custom-shadow flex items-start gap-lg hover:border-primary/30 transition-colors">
+<div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600">
+<span class="material-symbols-outlined">sync</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-secondary-container">正在解析</p>
+<p class="font-headline-md text-headline-md mt-1">12</p>
+</div>
+</div>
+<div class="glass-card p-lg rounded-xl custom-shadow flex items-start gap-lg hover:border-primary/30 transition-colors">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">storage</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-secondary-container">已用存储</p>
+<p class="font-headline-md text-headline-md mt-1">4.2 <span class="text-sm font-normal text-on-surface-variant">GB</span></p>
+</div>
+</div>
+</section>
+<!-- Document List Area -->
+<section class="flex-1 flex flex-col gap-lg min-h-0">
+<div class="glass-card rounded-xl custom-shadow overflow-hidden flex flex-col h-full">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low border-b border-surface-variant">
+<tr>
+<th class="px-xl py-lg font-label-md text-label-md text-on-surface-variant">文件名</th>
+<th class="px-lg py-lg font-label-md text-label-md text-on-surface-variant text-center">格式</th>
+<th class="px-lg py-lg font-label-md text-label-md text-on-surface-variant">上传时间</th>
+<th class="px-lg py-lg font-label-md text-label-md text-on-surface-variant">解析状态</th>
+<th class="px-xl py-lg font-label-md text-label-md text-on-surface-variant text-right">操作</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-variant/50">
+<!-- Table Row 1 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-xl py-lg">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center text-red-500">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+</div>
+<span class="font-body-md text-body-md font-semibold text-on-surface">2024年度Q1市场调研报告.pdf</span>
+</div>
+</td>
+<td class="px-lg py-lg text-center">
+<span class="px-sm py-1 bg-surface-container-highest rounded text-[10px] font-bold text-on-secondary-container">PDF</span>
+</td>
+<td class="px-lg py-lg font-body-md text-body-md text-on-surface-variant">2024-03-24 14:30</td>
+<td class="px-lg py-lg">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 rounded-full text-[12px] font-medium border border-green-100">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                        已完成
+                                    </span>
+</td>
+<td class="px-xl py-lg text-right">
+<div class="flex items-center justify-end gap-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors p-1" onclick="openPreview()" title="预览">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+<button class="text-on-surface-variant hover:text-amber-600 transition-colors p-1" title="重新解析">
+<span class="material-symbols-outlined text-[20px]">refresh</span>
+</button>
+<button class="text-on-surface-variant hover:text-error transition-colors p-1" title="删除">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Table Row 2 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-xl py-lg">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500">
+<span class="material-symbols-outlined">article</span>
+</div>
+<span class="font-body-md text-body-md font-semibold text-on-surface">产品设计指南_v2.docx</span>
+</div>
+</td>
+<td class="px-lg py-lg text-center">
+<span class="px-sm py-1 bg-surface-container-highest rounded text-[10px] font-bold text-on-secondary-container">DOCX</span>
+</td>
+<td class="px-lg py-lg font-body-md text-body-md text-on-surface-variant">2024-03-25 09:15</td>
+<td class="px-lg py-lg">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-[12px] font-medium border border-amber-100">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                        解析中
+                                    </span>
+</td>
+<td class="px-xl py-lg text-right text-on-surface-variant">
+<div class="flex items-center justify-end gap-md">
+<button class="opacity-30 cursor-not-allowed p-1" disabled="">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+<button class="opacity-30 cursor-not-allowed p-1" disabled="">
+<span class="material-symbols-outlined text-[20px]">refresh</span>
+</button>
+<button class="hover:text-error transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Table Row 3 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-xl py-lg">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">text_snippet</span>
+</div>
+<span class="font-body-md text-body-md font-semibold text-on-surface">会议纪要_20240322.txt</span>
+</div>
+</td>
+<td class="px-lg py-lg text-center">
+<span class="px-sm py-1 bg-surface-container-highest rounded text-[10px] font-bold text-on-secondary-container">TXT</span>
+</td>
+<td class="px-lg py-lg font-body-md text-body-md text-on-surface-variant">2024-03-22 17:45</td>
+<td class="px-lg py-lg">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-error-container/20 text-error rounded-full text-[12px] font-medium border border-error/10">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                                        解析失败
+                                    </span>
+</td>
+<td class="px-xl py-lg text-right">
+<div class="flex items-center justify-end gap-md">
+<button class="opacity-30 cursor-not-allowed p-1" disabled="">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+<button class="text-on-surface-variant hover:text-amber-600 transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">refresh</span>
+</button>
+<button class="text-on-surface-variant hover:text-error transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination / Footer -->
+<div class="mt-auto px-xl py-md border-t border-surface-variant flex items-center justify-between">
+<p class="font-label-md text-label-md text-on-surface-variant">显示 1-10 / 共 128 条记录</p>
+<div class="flex items-center gap-xs">
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-surface-variant text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-on-primary font-label-md">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-surface-variant text-on-surface-variant hover:bg-surface-container-low transition-colors font-label-md">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-surface-variant text-on-surface-variant hover:bg-surface-container-low transition-colors font-label-md">3</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-surface-variant text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Upload Modal -->
+<div class="fixed inset-0 bg-on-surface/40 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300" id="uploadModal">
+<div class="bg-surface w-full max-w-[600px] rounded-2xl p-xl custom-shadow transform scale-95 transition-transform duration-300">
+<div class="flex justify-between items-center mb-xl">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">上传新文档</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">支持 PDF, DOCX, TXT 格式，最大支持 50MB</p>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-on-surface p-2" onclick="toggleModal('uploadModal')">close</button>
+</div>
+<div class="border-2 border-dashed border-primary/30 bg-primary/5 rounded-2xl p-xl flex flex-col items-center justify-center gap-lg hover:bg-primary/10 hover:border-primary transition-all cursor-pointer group">
+<div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[32px]">cloud_upload</span>
+</div>
+<div class="text-center">
+<p class="font-body-lg text-body-lg font-bold text-on-surface">拖拽文件到此处</p>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">或者 <span class="text-primary font-semibold">浏览本地文件</span></p>
+</div>
+<input class="hidden" type="file"/>
+</div>
+<div class="mt-xl flex justify-end gap-md">
+<button class="px-lg py-2.5 rounded-lg border border-surface-variant font-label-md text-on-surface-variant hover:bg-surface-container-low transition-colors" onclick="toggleModal('uploadModal')">取消</button>
+<button class="px-lg py-2.5 rounded-lg bg-primary text-on-primary font-label-md hover:shadow-lg transition-all">开始上传</button>
+</div>
+</div>
+</div>
+<!-- Preview Side Drawer -->
+<div class="fixed top-0 right-0 h-screen w-full md:w-[600px] bg-surface shadow-[-20px_0_50px_rgba(0,0,0,0.05)] z-40 translate-x-full transition-transform duration-500 ease-out flex flex-col" id="previewDrawer">
+<div class="h-16 border-b border-surface-variant flex items-center justify-between px-xl bg-surface/80 backdrop-blur-md">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-red-500">picture_as_pdf</span>
+<span class="font-headline-sm text-headline-sm font-semibold truncate max-w-[300px]">2024年度Q1市场调研报告.pdf</span>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-on-surface p-2" onclick="closePreview()">close</button>
+</div>
+<div class="flex-1 overflow-y-auto p-xl bg-surface-container-low/30">
+<div class="bg-surface-container-lowest p-xl rounded-xl custom-shadow min-h-full border border-surface-variant/30">
+<div class="prose prose-sm max-w-none font-body-md text-on-surface-variant space-y-lg">
+<h1 class="text-2xl font-bold text-on-surface mb-md">2024年第一季度市场调研分析报告</h1>
+<p class=""><strong>摘要：</strong> 本报告旨在分析2024年第一季度全球人工智能及企业级软件市场的竞争格局。调研显示，生成式AI的应用已从实验室阶段全面走向商业化落地，企业对知识库管理、自动化工作流的需求增长了150%。</p>
+<h2 class="text-xl font-semibold text-on-surface">一、市场现状</h2>
+<p class="">随着LLM大模型技术的成熟，企业私域数据的价值日益凸显。传统的非结构化数据管理方式已无法满足AI的实时性需求，检索增强生成（RAG）技术成为行业标准。</p>
+<img class="w-full rounded-lg my-lg border border-surface-variant/20" data-alt="A minimalist data visualization chart showing upward market trends for AI software in 2024. The style is modern business minimalism with a clean white background and professional indigo and soft gray accents. High-key lighting and crisp vector aesthetic. The mood is optimistic and analytical." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8qRQ2VbqXM6fK6DZ_kTrpRey3qSEpp9bpgITZJbx-Um0ZEO5ZrK5TZX7k8NeySOUjmXo4MqmCthpEi3lPKBuuGLd2bgXdYzMIkxzGwEEhBc7WCTNmydT7epBo7c0xH3zw1_iIH_LLOcO9u-IeeiClPyw8I8iPMjyK6nBxyhg0vQvzigPJf0Xo2pyLGK8J__bTBQrqg_Jj0RSLRz9P1WuZbOb4tBzQomVCMimDljiOYAbR0Jb20vi_7UiGn1TevxZPlL1Um-PG-Os"/>
+<h2 class="text-xl font-semibold text-on-surface">二、核心竞争力分析</h2>
+<ul class="list-disc pl-lg space-y-sm">
+<li class="">数据解析的准确度与分块策略（Chunking）</li>
+<li class="">多模态数据支持能力（PDF, Image, Text）</li>
+<li class="">与现有业务系统的集成便捷度</li>
+</ul>
+<p class="">在接下来的季度中，我们将重点优化知识库的解析引擎，提升对复杂表格和数学公式的理解能力...</p>
+</div>
+</div>
+</div>
+<div class="p-lg bg-surface border-t border-surface-variant flex items-center justify-between">
+<div class="flex items-center gap-md">
+<button class="flex items-center gap-sm px-lg py-2 bg-surface-container text-on-surface-variant rounded-lg font-label-md hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                    下载原文件
+                </button>
+</div>
+<button class="px-lg py-2 bg-primary text-on-primary rounded-lg font-label-md hover:shadow-md transition-all">引用至对话</button>
+</div>
+</div>
+<script>
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            const content = modal.firstElementChild;
+            if (modal.classList.contains('opacity-0')) {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            } else {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                content.classList.remove('scale-100');
+                content.classList.add('scale-95');
+            }
+        }
+
+        function openPreview() {
+            const drawer = document.getElementById('previewDrawer');
+            drawer.classList.remove('translate-x-full');
+        }
+
+        function closePreview() {
+            const drawer = document.getElementById('previewDrawer');
+            drawer.classList.add('translate-x-full');
+        }
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            const icon = document.getElementById('themeIcon');
+            if (icon) {
+                icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+            }
+        }
+
+        // Close drawer when clicking outside (on the main content)
+        document.addEventListener('mousedown', (e) => {
+            const drawer = document.getElementById('previewDrawer');
+            if (!drawer.contains(e.target) && !e.target.closest('button[onclick="openPreview()"]')) {
+                closePreview();
+            }
+        });
+    </script>
+</body></html>

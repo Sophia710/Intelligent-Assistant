@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+/* ===== Tailwind v4: dark mode class 策略 ===== */
+@variant dark (&:where(.dark, .dark *));
+
+/* ===== 主题 CSS 变量 — 明主题 (Light) ===== */
+:root {
+  --color-surface: #fcf9f8;
+  --color-surface-dim: #dcd9d9;
+  --color-surface-bright: #fcf9f8;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f6f3f2;
+  --color-surface-container: #f0eded;
+  --color-surface-container-high: #eae7e7;
+  --color-surface-container-highest: #e5e2e1;
+  --color-surface-variant: #e5e2e1;
+
+  --color-on-surface: #1c1b1b;
+  --color-on-surface-variant: #464556;
+
+  --color-primary: #3d32e6;
+  --color-primary-container: #5852ff;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #f2eeff;
+
+  --color-secondary: #5d5f5f;
+  --color-secondary-container: #dcdddd;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #5f6161;
+
+  --color-tertiary: #632fcc;
+  --color-tertiary-container: #7c4de6;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #f5edff;
+
+  --color-outline: #777588;
+  --color-outline-variant: #c7c4d9;
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  --color-inverse-surface: #313030;
+  --color-inverse-on-surface: #f3f0ef;
+  --color-inverse-primary: #c2c1ff;
+
+  --color-background: #fcf9f8;
+  --color-on-background: #1c1b1b;
+}
+
+/* ===== 主题 CSS 变量 — 暗主题 (Dark) ===== */
+.dark {
+  --color-surface: #051424;
+  --color-surface-dim: #051424;
+  --color-surface-bright: #2c3a4c;
+  --color-surface-container-lowest: #010f1f;
+  --color-surface-container-low: #0d1c2d;
+  --color-surface-container: #122131;
+  --color-surface-container-high: #1c2b3c;
+  --color-surface-container-highest: #273647;
+  --color-surface-variant: #273647;
+
+  --color-on-surface: #d4e4fa;
+  --color-on-surface-variant: #c7c4d6;
+
+  --color-primary: #c3c0ff;
+  --color-primary-container: #8682ff;
+  --color-on-primary: #1e00a5;
+  --color-on-primary-container: #190092;
+
+  --color-secondary: #7bd0ff;
+  --color-secondary-container: #00a6e0;
+  --color-on-secondary: #00354a;
+  --color-on-secondary-container: #00374d;
+
+  --color-tertiary: #ffb869;
+  --color-tertiary-container: #cd7f0e;
+  --color-on-tertiary: #482900;
+  --color-on-tertiary-container: #3f2300;
+
+  --color-outline: #918fa0;
+  --color-outline-variant: #464554;
+
+  --color-error: #ffb4ab;
+  --color-error-container: #93000a;
+  --color-on-error: #690005;
+  --color-on-error-container: #ffdad6;
+
+  --color-inverse-surface: #d4e4fa;
+  --color-inverse-on-surface: #233143;
+  --color-inverse-primary: #514ad1;
+
+  --color-background: #051424;
+  --color-on-background: #d4e4fa;
+}
+
+/* ===== 全局平滑过渡（主题切换时颜色渐变） ===== */
+html.transitioning-theme,
+html.transitioning-theme *,
+html.transitioning-theme *::before,
+html.transitioning-theme *::after {
+  transition:
+    background-color 200ms ease-in-out,
+    color 200ms ease-in-out,
+    border-color 200ms ease-in-out,
+    box-shadow 200ms ease-in-out !important;
+}
+
+/* ===== Material Symbols 配置 ===== */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 隐藏滚动条 */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* 自定义滚动条 */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-outline); border-radius: 10px; }
+
+body { font-family: 'Inter', sans-serif; }
+
+/* input / textarea 占位符颜色跟随主题 */
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-on-surface-variant) !important;
+  opacity: 1;
+}
+
+/* 动画 */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
