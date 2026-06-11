@@ -75,10 +75,25 @@ export default function SkillPickerModal({ open, onClose, onConfirm, skills = []
         <div className="flex-1 overflow-y-auto -mx-1 px-1">
           {filtered.length === 0 ? (
             <div
-              className="text-center py-10 text-sm"
+              className="text-center py-10 px-4 text-sm flex flex-col items-center gap-2"
               style={{ color: 'var(--color-on-surface-variant)' }}
             >
-              {keyword ? `未找到「${keyword}」相关技能` : '暂无可加载的技能'}
+              <span
+                className="material-symbols-outlined text-[36px]"
+                style={{ opacity: 0.5 }}
+              >
+                extension_off
+              </span>
+              <p>
+                {keyword
+                  ? `未找到「${keyword}」相关技能`
+                  : '暂无可加载的已启用技能'}
+              </p>
+              {!keyword && (
+                <p className="text-[11px]" style={{ color: 'var(--color-on-surface-variant)', opacity: 0.8 }}>
+                  请前往「技能中心」→「我的技能」开启启用开关
+                </p>
+              )}
             </div>
           ) : (
             <div className="flex flex-col gap-2">

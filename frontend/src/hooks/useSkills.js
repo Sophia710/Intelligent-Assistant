@@ -3,6 +3,7 @@ import {
   AGENTS,
   SKILLS,
   DEFAULT_ADDED_SKILL_IDS,
+  DEFAULT_ENABLED_SKILL_IDS,
   STORAGE_KEYS,
 } from '../data/seedSkills'
 
@@ -40,6 +41,12 @@ function useSkills() {
   // 自定义技能
   const [customSkills, setCustomSkills] = useState(() => readJSON(STORAGE_KEYS.CUSTOMS, []))
 
+  // 已启用的技能 ID（我的技能模块中可被"启用开关"控制）
+  const [enabledIds, setEnabledIds] = useState(() => {
+    const stored = readJSON(STORAGE_KEYS.ENABLED, null)
+    return stored === null ? new Set(DEFAULT_ENABLED_SKILL_IDS) : new Set(stored)
+  })
+
   /* ---------- 持久化 ---------- */
   useEffect(() => {
     try {
@@ -60,6 +67,17 @@ function useSkills() {
     }
   }, [customSkills])
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        STORAGE_KEYS.ENABLED,
+        JSON.stringify(Array.from(enabledIds))
+      )
+    } catch {
+      /* ignore */
+    }
+  }, [enabledIds])
+
   /* ---------- 派生数据 ---------- */
   // 我的技能 = 已添加的内置技能 + 自定义技能
   const mySkills = useMemo(() => {
@@ -67,9 +85,36 @@ function useSkills() {
     return [...builtin, ...customSkills]
   }, [addedIds, customSkills])
 
+  /**
+   * 为 mySkills 注入 enabled 字段
+   *  - 自定义技能：默认 enabled=true（首次添加即启用）
+   *  - 内置技能：从 enabledIds 集合中读取
+   */
+  const mySkillsWithEnabled = useMemo(() => {
+    return mySkills.map((s) => {
+      if (s.type === 'custom') {
+        return { ...s, enabled: enabledIds.has(s.id) }
+      }
+      return { ...s, enabled: enabledIds.has(s.id) }
+    })
+  }, [mySkills, enabledIds])
+
+  /** 仅启用的"我的技能" - 用于聊天输入框"加载技能" */
+  const enabledSkills = useMemo(
+    () => mySkillsWithEnabled.filter((s) => s.enabled),
+    [mySkillsWithEnabled]
+  )
+
   /* ---------- 操作 ---------- */
   const addSkill = useCallback((skillId) => {
     setAddedIds((prev) => {
+      if (prev.has(skillId)) return prev
+      const next = new Set(prev)
+      next.add(skillId)
+      return next
+    })
+    // 新添加的技能默认启用
+    setEnabledIds((prev) => {
       if (prev.has(skillId)) return prev
       const next = new Set(prev)
       next.add(skillId)
@@ -84,9 +129,47 @@ function useSkills() {
       next.delete(skillId)
       return next
     })
+    // 移除时同步清理 enabled
+    setEnabledIds((prev) => {
+      if (!prev.has(skillId)) return prev
+      const next = new Set(prev)
+      next.delete(skillId)
+      return next
+    })
   }, [])
 
   const isAdded = useCallback((skillId) => addedIds.has(skillId), [addedIds])
+
+  /**
+   * 切换"启用"状态
+   *
+   * 关键修复：之前通过 setState 回调的闭包副作用回填 result，在 React 18 严格模式/
+   * 并发渲染下不稳定，导致启用已停用技能时返回值错误地回退为 false。
+   * 现在改为：基于当前 enabledIds + next 参数同步、确定地计算目标态，
+   * 再独立触发 setEnabledIds 更新，二者完全解耦。
+   *
+   * @param {string} skillId
+   * @param {boolean} [next] - 指定目标值；不传则取反
+   * @returns {boolean} 切换后的最终状态
+   */
+  const toggleEnabled = useCallback((skillId, next) => {
+    // 1) 同步、确定地计算目标态（不依赖 setState 副作用）
+    const want =
+      typeof next === 'boolean' ? next : !enabledIds.has(skillId)
+
+    // 2) 触发实际状态更新
+    setEnabledIds((prev) => {
+      const set = new Set(prev)
+      if (want) set.add(skillId)
+      else set.delete(skillId)
+      return set
+    })
+
+    // 3) 立即返回确定的目标态给调用方
+    return want
+  }, [enabledIds])
+
+  const isEnabled = useCallback((skillId) => enabledIds.has(skillId), [enabledIds])
 
   const createCustomSkill = useCallback((draft) => {
     // draft: { name, description, icon, iconBg, triggerCommand, promptTemplate }
@@ -101,28 +184,41 @@ function useSkills() {
       triggerCommand: draft.triggerCommand || '',
       promptTemplate: draft.promptTemplate || '',
       category: 'custom',
+      enabled: true,           // 自定义技能默认启用
       createdAt: new Date().toISOString(),
     }
     setCustomSkills((prev) => [newSkill, ...prev])
+    // 同步写入 enabledIds
+    setEnabledIds((prev) => {
+      const next = new Set(prev)
+      next.add(id)
+      return next
+    })
     return newSkill
   }, [])
 
   const deleteCustomSkill = useCallback((skillId) => {
     setCustomSkills((prev) => prev.filter((s) => s.id !== skillId))
+    setEnabledIds((prev) => {
+      if (!prev.has(skillId)) return prev
+      const next = new Set(prev)
+      next.delete(skillId)
+      return next
+    })
   }, [])
 
   /* ---------- 搜索 ---------- */
   const searchSkills = useCallback(
     (keyword) => {
       const k = keyword?.trim().toLowerCase()
-      if (!k) return mySkills
-      return mySkills.filter(
+      if (!k) return mySkillsWithEnabled
+      return mySkillsWithEnabled.filter(
         (s) =>
           s.name.toLowerCase().includes(k) ||
           s.description?.toLowerCase().includes(k)
       )
     },
-    [mySkills]
+    [mySkillsWithEnabled]
   )
 
   return {
@@ -133,12 +229,16 @@ function useSkills() {
     builtinSkills: SKILLS,
     // 用户数据
     addedIds,
-    mySkills,
+    enabledIds,
+    mySkills: mySkillsWithEnabled,    // 已含 enabled 字段
+    enabledSkills,                    // 仅启用的我的技能
     customSkills,
     // 操作
     addSkill,
     removeSkill,
     isAdded,
+    toggleEnabled,
+    isEnabled,
     createCustomSkill,
     deleteCustomSkill,
     searchSkills,

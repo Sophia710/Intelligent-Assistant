@@ -89,15 +89,32 @@ function AgentCard({ agent, isAdded = false, onAdd, onUse, onClick }) {
         {agent.description}
       </p>
 
-      {/* 底部：分类标签 + 使用按钮 */}
+      {/* 底部：分类标签 + 添加/已添加 按钮 */}
       <div className="flex items-center justify-between gap-2 mt-auto pt-2">
         <CategoryBadge category={agent.category} />
 
         {isAdded ? (
+          // 已添加状态：disabled 视觉反馈
+          <button
+            disabled
+            aria-disabled="true"
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 cursor-default"
+            style={{
+              backgroundColor: 'color-mix(in srgb, var(--color-primary) 12%, transparent)',
+              color: 'var(--color-primary)',
+              border: '1px solid color-mix(in srgb, var(--color-primary) 40%, transparent)',
+            }}
+            title="已添加到「我的技能」"
+          >
+            <span className="material-symbols-outlined text-[14px]">check_circle</span>
+            已添加
+          </button>
+        ) : (
+          // 未添加状态：可点击
           <button
             onClick={(e) => {
               e.stopPropagation()
-              onUse?.(agent)
+              onAdd?.(agent)
             }}
             className="px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1 transition-all duration-200 cursor-pointer"
             style={{
@@ -107,31 +124,11 @@ function AgentCard({ agent, isAdded = false, onAdd, onUse, onClick }) {
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.opacity = '0.9'
+              e.currentTarget.style.transform = 'translateY(-1px)'
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.opacity = '1'
-            }}
-            title="立即使用该智能体"
-          >
-            <span className="material-symbols-outlined text-[14px]">play_arrow</span>
-            使用
-          </button>
-        ) : (
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onAdd?.(agent)
-            }}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition-all duration-200 cursor-pointer"
-            style={{
-              backgroundColor: 'var(--color-on-surface)',
-              color: 'var(--color-surface)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = '0.85'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = '1'
+              e.currentTarget.style.transform = 'translateY(0)'
             }}
             title="添加到我的技能"
           >

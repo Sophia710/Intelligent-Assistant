@@ -52,6 +52,7 @@ function SkillsCenterPage() {
     addSkill,
     removeSkill,
     isAdded,
+    toggleEnabled,
     createCustomSkill,
     deleteCustomSkill,
   } = useSkills()
@@ -69,6 +70,20 @@ function SkillsCenterPage() {
     } else {
       removeSkill(skill.id)
       toast.success(`已从我的技能中移除「${skill.name}」`)
+    }
+  }
+
+  /**
+   * 切换技能"启用"状态
+   * - 启用：聊天输入框的"加载技能"中可见
+   * - 停用：聊天输入框中隐藏
+   */
+  const handleToggleEnabled = (skill, next) => {
+    const finalState = toggleEnabled(skill.id, next)
+    if (finalState) {
+      toast.success(`已启用「${skill.name}」`)
+    } else {
+      toast.info(`已停用「${skill.name}」`)
     }
   }
 
@@ -198,6 +213,7 @@ function SkillsCenterPage() {
               mySkills={mySkills}
               onUse={handleUse}
               onRemove={handleRemove}
+              onToggleEnabled={handleToggleEnabled}
               onCreate={() => setCreateOpen(true)}
               keyword={keyword}
             />

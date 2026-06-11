@@ -396,4 +396,8 @@ export const DEFAULT_ADDED_SKILL_IDS = ['agt-ppt', 'agt-code-review']
 export const STORAGE_KEYS = {
   ADDED:    'user:skills:added:v1',
   CUSTOMS:  'user:skills:customs:v1',
+  ENABLED:  'user:skills:enabled:v1',
 }
+
+/* ===== 用户初始已启用的技能（首次进入默认预置 2 个，与 ADDED 同步） ===== */
+export const DEFAULT_ENABLED_SKILL_IDS = ['agt-ppt', 'agt-code-review']

@@ -5,13 +5,23 @@ import MySkillCard from './MySkillCard'
  * 我的技能 Tab
  *
  * Props:
- *   mySkills   : 已添加技能列表
- *   onUse      : (skill) => void
- *   onRemove   : (skill) => void
- *   onCreate   : () => void
- *   keyword    : string   - 来自 header 的搜索关键词
+ *   mySkills        : 已添加技能列表（含 enabled 字段）
+ *   onUse           : (skill) => void
+ *   onRemove        : (skill) => void
+ *   onToggleEnabled : (skill, next:boolean) => void
+ *   onCreate        : () => void
+ *   onEdit          : (skill) => void
+ *   keyword         : string
  */
-function MySkillsTab({ mySkills, onUse, onRemove, onCreate, keyword = '' }) {
+function MySkillsTab({
+  mySkills,
+  onUse,
+  onRemove,
+  onToggleEnabled,
+  onCreate,
+  onEdit,
+  keyword = '',
+}) {
   const filtered = useMemo(() => {
     const k = keyword.trim().toLowerCase()
     if (!k) return mySkills
@@ -21,6 +31,10 @@ function MySkillsTab({ mySkills, onUse, onRemove, onCreate, keyword = '' }) {
         s.description?.toLowerCase().includes(k)
     )
   }, [mySkills, keyword])
+
+  // 启/停用 数量统计
+  const enabledCount = filtered.filter((s) => s.enabled !== false).length
+  const disabledCount = filtered.length - enabledCount
 
   return (
     <div className="flex flex-col gap-5 tab-fade-in">
@@ -34,6 +48,23 @@ function MySkillsTab({ mySkills, onUse, onRemove, onCreate, keyword = '' }) {
         </div>
       )}
 
+      {/* 启/停用统计 */}
+      {filtered.length > 0 && (
+        <div
+          className="text-xs flex items-center gap-3 transition-colors duration-200"
+          style={{ color: 'var(--color-on-surface-variant)' }}
+        >
+          <span>
+            <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{enabledCount}</span> 个已启用
+          </span>
+          {disabledCount > 0 && (
+            <span>
+              <span style={{ color: 'var(--color-on-surface-variant)' }}>{disabledCount}</span> 个已停用
+            </span>
+          )}
+        </div>
+      )}
+
       {/* 技能网格 */}
       {filtered.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -43,6 +74,8 @@ function MySkillsTab({ mySkills, onUse, onRemove, onCreate, keyword = '' }) {
               skill={skill}
               onUse={onUse}
               onRemove={onRemove}
+              onToggleEnabled={onToggleEnabled}
+              onEdit={onEdit}
             />
           ))}
         </div>

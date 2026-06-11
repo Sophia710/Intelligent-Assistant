@@ -19,6 +19,7 @@ import { useParams } from 'react-router-dom'
 import ChatInput from '../components/ChatInput'
 import useMessages from '../hooks/useMessages'
 import useSkills from '../hooks/useSkills'
+import useCustomAgents from '../hooks/useCustomAgents'
 
 /* 用户消息组件 */
 function UserMessage({ message }) {
@@ -884,7 +885,15 @@ export default function ChatPage() {
   } = useMessages(id)
 
   // 加载可选技能/智能体列表
-  const { builtinSkills, agents } = useSkills()
+  const { enabledSkills, agents: builtinAgents } = useSkills()
+  const { list: customAgents } = useCustomAgents()
+
+  // 合并内置 + 自定义智能体 (自定义优先),每条注入 type 字段
+  const allAgents = React.useMemo(() => {
+    const customs = customAgents.map((a) => ({ ...a, type: 'custom' }))
+    const builtins = (builtinAgents || []).map((a) => ({ ...a, type: 'builtin' }))
+    return [...customs, ...builtins]
+  }, [builtinAgents, customAgents])
 
   // 用于在 await 之后读取最新的 messages（必须在 messages 解构之后声明，避免 TDZ）
   const messagesRef = useRef(messages)
@@ -1215,8 +1224,8 @@ export default function ChatPage() {
             maxWidth="max-w-[1200px]"
             streaming={isStreaming}
             onStop={handleStop}
-            availableSkills={builtinSkills}
-            availableAgents={agents}
+            availableSkills={enabledSkills}
+            availableAgents={allAgents}
           />
 
           <div className="text-center mt-2">

@@ -10,17 +10,30 @@
  * - AI 免责声明文字
  */
 
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ChatInput from '../components/ChatInput'
 import useConversations from '../hooks/useConversations'
 import useSkills from '../hooks/useSkills'
+import useCustomAgents from '../hooks/useCustomAgents'
 
 export default function NewChatPage() {
   const navigate = useNavigate()
   const { createConversation } = useConversations()
-  const { builtinSkills, agents } = useSkills()
+  const { enabledSkills, agents: builtinAgents } = useSkills()
+  const { list: customAgents } = useCustomAgents()
   const [loading, setLoading] = useState(false)
+
+  /**
+   * 合并内置 + 自定义智能体,每条注入 type 字段
+   *  - 自定义智能体在前面 (新创建优先曝光)
+   *  - ChatInput 通过 availableAgents 传给 AgentPickerModal
+   */
+  const allAgents = useMemo(() => {
+    const customs = customAgents.map((a) => ({ ...a, type: 'custom' }))
+    const builtins = (builtinAgents || []).map((a) => ({ ...a, type: 'builtin' }))
+    return [...customs, ...builtins]
+  }, [builtinAgents, customAgents])
 
   // 发送消息 -> 创建新对话 -> 跳转到对话详情页
   // payload: { text, files, skills, agents } - ChatInput 增强版传入
@@ -94,8 +107,8 @@ export default function NewChatPage() {
         <ChatInput
           onSend={handleSendMessage}
           disabled={loading}
-          availableSkills={builtinSkills}
-          availableAgents={agents}
+          availableSkills={enabledSkills}
+          availableAgents={allAgents}
         />
         <p
           className="text-[11px] text-center mt-2 transition-colors duration-200"
