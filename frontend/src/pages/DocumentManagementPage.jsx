@@ -50,9 +50,8 @@ export default function DocumentManagementPage() {
   const navigate = useNavigate()
   const { documents, rawStats, loading, uploadDocument, deleteDocument, reparseDocument } = useDocuments(kbId)
 
-  // ===== State（必须先于 useEffect，避免 linter 警告）=====
+  // ===== State(必须先于 useEffect,避免 linter 警告)=====
   const [kbName, setKbName] = useState('')
-  const [kbLoading, setKbLoading] = useState(true)
   const [searchKeyword, setSearchKeyword] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [showUploadModal, setShowUploadModal] = useState(false)
@@ -60,11 +59,10 @@ export default function DocumentManagementPage() {
   const [previewContent, setPreviewContent] = useState(null)
   const pageSize = 10
 
-  // 从 API 加载知识库名称，用于动态标题 + 面包屑
+  // 从 API 加载知识库名称,用于动态标题 + 面包屑
   useEffect(() => {
     let cancelled = false
     const loadKB = async () => {
-      setKbLoading(true)
       try {
         const res = await api.get(`/knowledge-bases/${kbId}`)
         if (!cancelled) {
@@ -76,8 +74,6 @@ export default function DocumentManagementPage() {
         if (!cancelled) {
           setKbName('文档管理')
         }
-      } finally {
-        if (!cancelled) setKbLoading(false)
       }
     }
     if (kbId) loadKB()
@@ -151,26 +147,36 @@ export default function DocumentManagementPage() {
       className="flex-1 min-w-0 flex flex-col pt-24 pb-10 px-4 md:px-10 max-w-[1600px] mx-auto w-full transition-colors duration-200"
       style={{ backgroundColor: 'var(--color-background)' }}
     >
-      {/* 头部操作栏 */}
-      <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div>
-          {/* 返回按钮 + 面包屑 */}
-          <button
-            onClick={() => navigate('/knowledge-base')}
-            className="flex items-center gap-1 text-xs mb-2 transition-colors hover:opacity-80"
-            style={{ color: 'var(--color-primary)' }}
-          >
-            <span className="material-symbols-outlined text-lg">arrow_back</span>
-            返回列表
-          </button>
-          <h2
-            className="text-3xl font-bold transition-colors duration-200"
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--color-on-surface)' }}
-          >
-            {kbLoading ? '加载中…' : (kbName || '文档管理')}
-          </h2>
-        </div>
+      {/* 头部操作栏 — 同行布局:返回按钮(左) + 搜索/上传(右) */}
+      <section className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 mb-8">
+        {/* 返回按钮(美化:描边+背景+阴影 hover,与设计规范统一) */}
+        <button
+          onClick={() => navigate('/knowledge-base')}
+          className="group inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 active:scale-[0.97] shrink-0"
+          style={{
+            color: 'var(--color-on-surface)',
+            backgroundColor: 'var(--color-surface-container-lowest)',
+            border: '1px solid var(--color-outline-variant)',
+            boxShadow: '0 1px 2px color-mix(in srgb, var(--color-on-surface) 4%, transparent)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--color-primary)'
+            e.currentTarget.style.borderColor = 'var(--color-primary)'
+            e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--color-primary) 8%, transparent)'
+            e.currentTarget.style.boxShadow = '0 2px 6px color-mix(in srgb, var(--color-primary) 18%, transparent)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--color-on-surface)'
+            e.currentTarget.style.borderColor = 'var(--color-outline-variant)'
+            e.currentTarget.style.backgroundColor = 'var(--color-surface-container-lowest)'
+            e.currentTarget.style.boxShadow = '0 1px 2px color-mix(in srgb, var(--color-on-surface) 4%, transparent)'
+          }}
+        >
+          <span className="material-symbols-outlined text-[18px] transition-transform duration-200 group-hover:-translate-x-0.5">arrow_back</span>
+          返回列表
+        </button>
 
+        {/* 搜索 + 上传 */}
         <div className="flex items-center gap-3 w-full md:w-auto">
           {/* 搜索框 */}
           <div className="relative flex-1 md:w-80">

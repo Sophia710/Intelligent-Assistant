@@ -10,7 +10,6 @@
  *   agents   : Agent[]   - 已合并好的智能体列表（每条带 type 字段 'builtin' | 'custom'）
  */
 import React, { useState, useMemo } from 'react'
-import { CATEGORIES } from '../data/seedSkills'
 import AgentTypeBadge from './agents/AgentTypeBadge'
 
 // 适配弹窗的精简分类 — 仅包含 "全部 / 内置 / 自定义" 三档
@@ -20,15 +19,72 @@ const QUICK_FILTERS = [
   { key: 'custom',  label: '我的自定义',   icon: 'person' },
 ]
 
+// 智能体业务分类标签（与 AgentCenterPage 保持一致）
+const CATEGORY_LABELS = {
+  terminal: '用户终端',
+  network: '星地网络',
+  payload: '卫星载荷',
+  e2e: '端到端',
+  office: '办公效率',
+  dev: '研发辅助',
+  test: '测试工具',
+  ops: '运维工具',
+  operation: '运营工具',
+  custom: '通用自定义',
+}
+
+// 与 AgentCenterPage 同步的图标主题映射（color_theme 字段）
+const ICON_BG_MAP = {
+  primary:   { bgVar: '--color-primary',           iconColorVar: '--color-primary' },
+  tertiary:  { bgVar: '--color-tertiary',          iconColorVar: '--color-tertiary' },
+  variant:   { bgVar: '--color-surface-container', iconColorVar: '--color-on-surface' },
+  error:     { bgVar: '--color-error-container',   iconColorVar: '--color-error' },
+}
+
+/**
+ * 解析主题:seed 数据中 color_theme 可能是命名键(builtin 中心渲染时使用)
+ * 也可能是 hex 字符串(由后端原始返回)。统一回退到 primary。
+ */
+function resolveTheme(agent) {
+  if (agent?.type === 'custom') return null // 自定义智能体使用自己的 iconBg 渐变
+  return ICON_BG_MAP[agent?.color_theme] || ICON_BG_MAP.primary
+}
+
+/**
+ * 状态徽章:与 seed 数据中 status 字段对齐(active / maintenance)
+ */
+function StatusBadge({ status }) {
+  if (!status || status === 'active') return null
+  const isMaint = status === 'maintenance'
+  return (
+    <span
+      className="inline-flex items-center gap-0.5 rounded font-semibold whitespace-nowrap text-[9px] px-1 py-0.5"
+      style={{
+        backgroundColor: isMaint
+          ? 'color-mix(in srgb, var(--color-error) 14%, transparent)'
+          : 'var(--color-surface-container-high)',
+        color: isMaint ? 'var(--color-error)' : 'var(--color-on-surface-variant)',
+        border: isMaint
+          ? '1px solid color-mix(in srgb, var(--color-error) 30%, transparent)'
+          : '1px solid var(--color-outline-variant)',
+      }}
+      title={isMaint ? '维护中,功能暂不可用' : status}
+    >
+      <span className="material-symbols-outlined" style={{ fontSize: '9px' }}>
+        {isMaint ? 'build' : 'info'}
+      </span>
+      {isMaint ? '维护中' : status}
+    </span>
+  )
+}
+
 export default function AgentPickerModal({ open, onClose, onConfirm, agents = [] }) {
   const [keyword, setKeyword] = useState('')
-  const [activeCategory, setActiveCategory] = useState('all')    // builtin 业务分类
   const [typeFilter, setTypeFilter] = useState('all')           // all/builtin/custom
 
   /**
    * 过滤
    *  - typeFilter 控制类型
-   *  - activeCategory 控制系统内置的子分类（仅当 typeFilter 含 builtin 时生效）
    *  - keyword 模糊匹配名称/描述
    */
   const filtered = useMemo(() => {
@@ -36,16 +92,13 @@ export default function AgentPickerModal({ open, onClose, onConfirm, agents = []
     return agents.filter((a) => {
       if (typeFilter === 'builtin' && a.type !== 'builtin') return false
       if (typeFilter === 'custom' && a.type !== 'custom') return false
-      if (typeFilter !== 'custom' && activeCategory !== 'all' && a.type === 'builtin' && a.category !== activeCategory) {
-        return false
-      }
       if (!k) return true
       return (
         (a.name || '').toLowerCase().includes(k) ||
         (a.description || '').toLowerCase().includes(k)
       )
     })
-  }, [agents, keyword, activeCategory, typeFilter])
+  }, [agents, keyword, typeFilter])
 
   // 统计
   const counts = useMemo(() => {
@@ -68,7 +121,6 @@ export default function AgentPickerModal({ open, onClose, onConfirm, agents = []
 
   const handleClose = () => {
     setKeyword('')
-    setActiveCategory('all')
     setTypeFilter('all')
     onClose?.()
   }
@@ -187,37 +239,6 @@ export default function AgentPickerModal({ open, onClose, onConfirm, agents = []
           })}
         </div>
 
-        {/* 内置业务分类（仅在选中/包含内置时显示） */}
-        {typeFilter !== 'custom' && (
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-1">
-            {CATEGORIES.map((c) => {
-              const active = c.key === activeCategory
-              return (
-                <button
-                  key={c.key}
-                  onClick={() => setActiveCategory(c.key)}
-                  className="px-2.5 py-1 rounded-full text-[10px] whitespace-nowrap transition-colors duration-200"
-                  style={
-                    active
-                      ? {
-                          backgroundColor: 'color-mix(in srgb, var(--color-primary) 18%, transparent)',
-                          color: 'var(--color-primary)',
-                          border: '1px solid color-mix(in srgb, var(--color-primary) 40%, transparent)',
-                        }
-                      : {
-                          backgroundColor: 'var(--color-surface-container)',
-                          color: 'var(--color-on-surface-variant)',
-                          border: '1px solid var(--color-outline-variant)',
-                        }
-                  }
-                >
-                  {c.label}
-                </button>
-              )
-            })}
-          </div>
-        )}
-
         {/* 列表 */}
         <div className="flex-1 overflow-y-auto -mx-1 px-1 mt-2">
           {filtered.length === 0 ? (
@@ -235,14 +256,18 @@ export default function AgentPickerModal({ open, onClose, onConfirm, agents = []
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {filtered.map((a) => (
+              {filtered.map((a) => {
+                const isCustom = a.type === 'custom'
+                const theme = resolveTheme(a)
+                const categoryLabel = CATEGORY_LABELS[a.category]
+                return (
                 <button
                   key={a.id}
                   onClick={() => onConfirm?.(a)}
                   className="text-left flex items-start gap-2.5 p-2.5 rounded-lg transition-colors duration-200"
                   style={{
                     backgroundColor: 'transparent',
-                    border: a.type === 'custom'
+                    border: isCustom
                       ? '1px solid color-mix(in srgb, var(--color-primary) 35%, var(--color-outline-variant))'
                       : '1px solid var(--color-outline-variant)',
                   }}
@@ -252,28 +277,38 @@ export default function AgentPickerModal({ open, onClose, onConfirm, agents = []
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = 'transparent'
-                    e.currentTarget.style.borderColor = a.type === 'custom'
+                    e.currentTarget.style.borderColor = isCustom
                       ? 'color-mix(in srgb, var(--color-primary) 35%, var(--color-outline-variant))'
                       : 'var(--color-outline-variant)'
                   }}
                 >
                   <div
                     className="w-9 h-9 rounded-md flex items-center justify-center shrink-0"
-                    style={{ background: a.iconBg || 'var(--color-primary)' }}
+                    style={
+                      isCustom
+                        ? { background: a.iconBg || 'var(--color-primary)' }
+                        : {
+                            backgroundColor: `color-mix(in srgb, var(${theme.bgVar}) 20%, transparent)`,
+                          }
+                    }
                   >
-                    <span className="material-symbols-outlined text-[18px] text-white">
+                    <span
+                      className="material-symbols-outlined text-[18px]"
+                      style={{ color: isCustom ? '#fff' : `var(${theme.iconColorVar})` }}
+                    >
                       {a.icon || 'smart_toy'}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 mb-0.5">
+                    <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
                       <p
-                        className="text-[13px] font-semibold truncate flex-1"
+                        className="text-[13px] font-semibold truncate flex-1 min-w-0"
                         style={{ color: 'var(--color-on-surface)' }}
                       >
                         {a.name}
                       </p>
                       <AgentTypeBadge type={a.type} size="xs" />
+                      <StatusBadge status={a.status} />
                     </div>
                     <p
                       className="text-[10px] line-clamp-2"
@@ -281,20 +316,34 @@ export default function AgentPickerModal({ open, onClose, onConfirm, agents = []
                     >
                       {a.description || '（暂无简介）'}
                     </p>
-                    {a.type === 'custom' && a.triggerCommand && (
-                      <code
-                        className="inline-block mt-1 text-[9px] px-1 py-0.5 rounded font-mono"
-                        style={{
-                          backgroundColor: 'var(--color-surface-container)',
-                          color: 'var(--color-on-surface-variant)',
-                        }}
-                      >
-                        /{a.triggerCommand}
-                      </code>
-                    )}
+                    <div className="mt-1 flex items-center gap-1 flex-wrap">
+                      {categoryLabel && (
+                        <span
+                          className="text-[9px] px-1 py-0.5 rounded font-medium"
+                          style={{
+                            backgroundColor: 'var(--color-surface-container)',
+                            color: 'var(--color-on-surface-variant)',
+                          }}
+                        >
+                          {categoryLabel}
+                        </span>
+                      )}
+                      {isCustom && a.triggerCommand && (
+                        <code
+                          className="text-[9px] px-1 py-0.5 rounded font-mono"
+                          style={{
+                            backgroundColor: 'var(--color-surface-container)',
+                            color: 'var(--color-on-surface-variant)',
+                          }}
+                        >
+                          /{a.triggerCommand}
+                        </code>
+                      )}
+                    </div>
                   </div>
                 </button>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>

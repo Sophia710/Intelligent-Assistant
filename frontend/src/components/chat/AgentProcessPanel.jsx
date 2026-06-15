@@ -159,12 +159,6 @@ export default function AgentProcessPanel({
           title="收起面板"
           onClick={() => setExpanded(false)}
         />
-        {/* 关闭按钮(完全卸载智能体) */}
-        <IconButton
-          icon="close"
-          title="关闭面板"
-          onClick={onClose}
-        />
       </div>
 
       {/* ====== Tabs ====== */}

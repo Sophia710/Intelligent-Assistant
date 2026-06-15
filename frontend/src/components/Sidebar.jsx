@@ -12,6 +12,10 @@ function Sidebar() {
   const navigate = useNavigate()
   const [conversations, setConversations] = useState([])
   const [userInfo, setUserInfo] = useState({ name: '用户', avatar: null })
+  // 知识库分组是否展开 — 当处于知识库或专栏相关路由时默认展开
+  const [kbGroupOpen, setKbGroupOpen] = useState(() =>
+    location.pathname.startsWith('/knowledge-base') || location.pathname.startsWith('/columns')
+  )
 
   // 获取最近对话列表
   useEffect(() => {
@@ -46,6 +50,13 @@ function Sidebar() {
 
   // 判断导航菜单是否激活
   const isActiveNav = (path) => location.pathname.startsWith(path)
+  // 知识库一级组是否激活
+  const isKbGroupActive =
+    location.pathname.startsWith('/knowledge-base') ||
+    location.pathname.startsWith('/columns')
+  // 二级导航
+  const isPersonalKbActive = location.pathname.startsWith('/knowledge-base')
+  const isColumnSubActive = location.pathname.startsWith('/columns')
 
   return (
     <aside
@@ -129,25 +140,96 @@ function Sidebar() {
           <span className="material-symbols-outlined text-[20px]">apps</span>
           技能中心
         </Link>
-        <Link
-          to="/knowledge-base"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-colors duration-200 border-l-4 ${
-            isActiveNav('/knowledge-base') ? 'font-medium' : ''
-          }`}
-          style={isActiveNav('/knowledge-base') ? {
-            backgroundColor: 'var(--color-surface-container-low)',
-            color: 'var(--color-on-surface)',
-            borderColor: 'var(--color-primary)',
-          } : {
-            color: 'var(--color-on-surface-variant)',
-            borderColor: 'transparent',
-          }}
-          onMouseEnter={(e) => { if (!isActiveNav('/knowledge-base')) e.currentTarget.style.backgroundColor = 'var(--color-surface-container-low)' }}
-          onMouseLeave={(e) => { if (!isActiveNav('/knowledge-base')) e.currentTarget.style.backgroundColor = 'transparent' }}
-        >
-          <span className="material-symbols-outlined text-[20px]">library_books</span>
-          知识库
-        </Link>
+        {/* 知识库 - 可折叠一级导航,含两个二级子项 */}
+        <div className="mb-1">
+          <button
+            type="button"
+            onClick={() => setKbGroupOpen((v) => !v)}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-200 border-l-4 ${
+              isKbGroupActive ? 'font-medium' : ''
+            }`}
+            style={isKbGroupActive ? {
+              backgroundColor: 'var(--color-surface-container-low)',
+              color: 'var(--color-on-surface)',
+              borderColor: 'var(--color-primary)',
+            } : {
+              color: 'var(--color-on-surface-variant)',
+              borderColor: 'transparent',
+            }}
+            onMouseEnter={(e) => { if (!isKbGroupActive) e.currentTarget.style.backgroundColor = 'var(--color-surface-container-low)' }}
+            onMouseLeave={(e) => { if (!isKbGroupActive) e.currentTarget.style.backgroundColor = 'transparent' }}
+          >
+            <span className="material-symbols-outlined text-[20px]">library_books</span>
+            <span className="flex-1 text-left">知识库</span>
+            <span
+              className="material-symbols-outlined text-[16px] transition-transform duration-200"
+              style={{
+                color: isKbGroupActive ? 'var(--color-on-surface)' : 'var(--color-on-surface-variant)',
+                transform: kbGroupOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+              }}
+            >chevron_right</span>
+          </button>
+
+          {/* 二级导航:仅展开时显示,含"个人知识库"与"专栏订阅" */}
+          {kbGroupOpen && (
+            <div className="mt-1 ml-3 pl-3 flex flex-col gap-0.5"
+              style={{ borderLeft: '1px dashed var(--color-outline-variant)' }}
+            >
+              <Link
+                to="/knowledge-base"
+                className={`flex items-center gap-2.5 pl-3 pr-3 py-2 rounded-lg transition-colors duration-200 ${
+                  isPersonalKbActive ? 'font-medium' : ''
+                }`}
+                style={isPersonalKbActive ? {
+                  backgroundColor: 'var(--color-surface-container-low)',
+                  color: 'var(--color-primary)',
+                } : {
+                  color: 'var(--color-on-surface-variant)',
+                }}
+                onMouseEnter={(e) => { if (!isPersonalKbActive) e.currentTarget.style.backgroundColor = 'var(--color-surface-container-low)' }}
+                onMouseLeave={(e) => { if (!isPersonalKbActive) e.currentTarget.style.backgroundColor = 'transparent' }}
+              >
+                <span
+                  className="material-symbols-outlined text-[16px]"
+                  style={{ color: isPersonalKbActive ? 'var(--color-primary)' : 'var(--color-outline)' }}
+                >folder</span>
+                <span className="text-[13px]">个人知识库</span>
+                {isPersonalKbActive && (
+                  <span
+                    className="ml-auto w-1.5 h-1.5 rounded-full"
+                    style={{ backgroundColor: 'var(--color-primary)' }}
+                  />
+                )}
+              </Link>
+              <Link
+                to="/columns"
+                className={`flex items-center gap-2.5 pl-3 pr-3 py-2 rounded-lg transition-colors duration-200 ${
+                  isColumnSubActive ? 'font-medium' : ''
+                }`}
+                style={isColumnSubActive ? {
+                  backgroundColor: 'var(--color-surface-container-low)',
+                  color: 'var(--color-primary)',
+                } : {
+                  color: 'var(--color-on-surface-variant)',
+                }}
+                onMouseEnter={(e) => { if (!isColumnSubActive) e.currentTarget.style.backgroundColor = 'var(--color-surface-container-low)' }}
+                onMouseLeave={(e) => { if (!isColumnSubActive) e.currentTarget.style.backgroundColor = 'transparent' }}
+              >
+                <span
+                  className="material-symbols-outlined text-[16px]"
+                  style={{ color: isColumnSubActive ? 'var(--color-primary)' : 'var(--color-outline)' }}
+                >newspaper</span>
+                <span className="text-[13px]">专栏订阅</span>
+                {isColumnSubActive && (
+                  <span
+                    className="ml-auto w-1.5 h-1.5 rounded-full"
+                    style={{ backgroundColor: 'var(--color-primary)' }}
+                  />
+                )}
+              </Link>
+            </div>
+          )}
+        </div>
       </nav>
 
       {/* 最近对话列表 */}

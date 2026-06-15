@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react'
 import { useLocation, useParams, Link } from 'react-router-dom'
 import api from '../services/api'
 import { useTheme } from '../contexts/ThemeContext'
+import ColumnNotificationBell from './columns/ColumnNotificationBell'
 
 // 页面标题映射
 const pageTitles = {
   '/chat/new': '新对话',
   '/agents': '智能体中心',
   '/skills': '技能中心',
-  '/knowledge-base': '知识库',
+  '/knowledge-base': '个人知识库',
+  '/columns': '专栏订阅',
 }
 
 function TopBar() {
@@ -55,13 +57,22 @@ function TopBar() {
     // 对话页面 — 显示实际对话标题或回退到默认值
     title = conversationTitle || (location.pathname === '/chat/new' ? '新对话' : '对话详情')
   } else if (location.pathname.startsWith('/knowledge-base/') && location.pathname.includes('/documents')) {
-    // 文档管理页 — 显示面包屑导航；末项默认「文档管理」，被 page-context-update 事件覆盖为 KB 实际名称
-    showBreadcrumb = true
-    title = ''
-    breadcrumbItems = [
-      { label: '知识库', path: '/knowledge-base' },
-      { label: breadcrumbLeaf || '文档管理', path: null },
-    ]
+    // 文档管理页 — 单标题 nav(与 h1 同款),末项默认「文档管理」,
+    // 实际 KB 名称通过 page-context-update 事件覆盖 breadcrumbLeaf,同步驱动 title
+    showBreadcrumb = 'single'
+    title = breadcrumbLeaf || '文档管理'
+  } else if (location.pathname === '/columns') {
+    // /columns — 用 nav 元素展示「专栏订阅」,样式与 h1 一致
+    showBreadcrumb = 'single'
+    title = '专栏订阅'
+  } else if (location.pathname.startsWith('/columns/') && location.pathname.includes('/articles/')) {
+    // /columns/:id/articles/:aid — 单标题 nav,与 /columns 同款
+    showBreadcrumb = 'single'
+    title = '专栏订阅'
+  } else if (location.pathname.startsWith('/columns/')) {
+    // /columns/:id — 单标题 nav,与 /columns 同款
+    showBreadcrumb = 'single'
+    title = '专栏订阅'
   } else {
     // 其他页面从映射表取标题
     title = pageTitles[location.pathname] || ''
@@ -82,7 +93,7 @@ function TopBar() {
           <span className="material-symbols-outlined text-[22px]">menu</span>
         </button>
 
-        {showBreadcrumb ? (
+        {showBreadcrumb === true ? (
           /* 面包屑导航 */
           <nav className="flex items-center gap-1.5 text-sm">
             {breadcrumbItems.map((item, index) => (
@@ -102,6 +113,14 @@ function TopBar() {
                 )}
               </React.Fragment>
             ))}
+          </nav>
+        ) : showBreadcrumb === 'single' ? (
+          /* 单标题 — 使用 nav 元素,样式与 h1 一致 */
+          <nav
+            className="text-[18px] leading-snug font-bold text-[#3d32e6]"
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+          >
+            {title}
           </nav>
         ) : (
           /* 页面标题 - 使用 primary 色调以匹配设计稿 */
@@ -152,6 +171,9 @@ function TopBar() {
         >
           <span className="material-symbols-outlined text-[22px]">notifications</span>
         </button>
+
+        {/* 专栏通知铃铛 - 展示已订阅专栏的未读更新数 */}
+        <ColumnNotificationBell />
 
         {/* 帮助按钮 */}
         <button

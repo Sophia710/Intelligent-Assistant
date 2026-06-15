@@ -1,12 +1,14 @@
 /**
- * 知识库页面 (04-知识库)
+ * 知识库页面 — 「个人知识库」(04-知识库)
  *
- * 功能：提供知识库的统一管理视图，支持创建、编辑、删除知识库及查看统计。
- * 路由：/knowledge-base
+ * 路由: /knowledge-base
  *
- * 包含：
- * - 头部操作栏（标题+搜索+新建按钮）
- * - 统计概览面板（3列卡片）
+ * 功能:个人私有知识库的统一管理视图,支持创建、编辑、删除知识库及查看统计。
+ *      专栏订阅内容已迁移至 /columns(侧边栏二级导航),本页面与之完全隔离。
+ *
+ * 包含:
+ * - 头部操作栏(标题+搜索+新建按钮)
+ * - 统计概览面板(3 列卡片)
  * - 知识库网格列表
  * - 新建/编辑/删除弹窗
  */
@@ -106,22 +108,8 @@ export default function KnowledgeBasePage() {
       <div className="max-w-7xl mx-auto space-y-8">
         {/* 头部操作栏 */}
         <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h2
-              className="text-3xl font-bold transition-colors duration-200"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--color-on-surface)' }}
-            >
-              知识库
-            </h2>
-            <p
-              className="text-sm mt-1 transition-colors duration-200"
-              style={{ color: 'var(--color-on-surface-variant)' }}
-            >
-              管理和组织您的卫星测试文档。
-            </p>
-          </div>
-
-          <div className="flex items-center gap-4 w-full md:w-auto">
+          {/* 靠右对齐:桌面端 ml-auto 推到右侧;移动端 self-end 在 flex-column 中右对齐 */}
+          <div className="flex items-center gap-4 w-full md:w-auto md:ml-auto self-end">
             {/* 搜索框 */}
             <div className="relative flex-1 md:w-80">
               <span
