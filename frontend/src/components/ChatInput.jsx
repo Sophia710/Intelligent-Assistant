@@ -37,12 +37,21 @@ export default function ChatInput({
   maxWidth = 'max-w-[800px]',
   availableSkills = [],
   availableAgents = [],
+  onLoadedAgentsChange,    // 智能体加载状态变化回调(供父组件判断是否切换布局)
 }) {
   /* ========== 状态 ========== */
   const [value, setValue] = useState('')
   const [files, setFiles] = useState([])      // [{ id, name, size, status: 'uploading'|'success'|'error', progress }]
   const [skills, setSkills] = useState([])    // [{ id, name, icon, status: 'loading'|'ready' }]
   const [agents, setAgents] = useState([])    // [{ id, name, icon, iconBg, status: 'loading'|'ready' }]
+
+  /* ========== 副作用:智能体列表变化时,通知父组件 ========== */
+  useEffect(() => {
+    if (typeof onLoadedAgentsChange === 'function') {
+      onLoadedAgentsChange(agents)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [agents])
 
   /* 弹窗 */
   const [fileModalOpen, setFileModalOpen] = useState(false)

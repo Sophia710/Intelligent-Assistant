@@ -178,7 +178,7 @@ export default function AgentCenterPage() {
             <input
               className="flex-1 bg-transparent border-none outline-none text-sm py-1 transition-colors duration-200"
               style={{ color: 'var(--color-on-surface)' }}
-              placeholder="搜索 AI 助手（名称 / 简介 / 分类）..."
+              placeholder="搜索 AI 助手..."
               type="text"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}

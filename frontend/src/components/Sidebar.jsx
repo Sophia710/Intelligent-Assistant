@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import api from '../services/api'
 
-/* 后端不可用时的 mock 对话列表 fallback（与 useMessages.js 中的 MOCK_CONVERSATIONS 一一对应） */
-const MOCK_CONVERSATIONS_FALLBACK = [
-  { id: 'conv-001', title: '新对话', status: 'empty' },
-  { id: 'conv-success-demo', title: '卫星互联网测试链路仿真方案', status: 'success' },
-  { id: 'conv-fail-demo', title: 'LEO-08 链路丢包异常（失败示例）', status: 'failed' },
-]
+/* 后端不可用时的 mock 对话列表 fallback(与 useMessages.js / mockConversations.js 中的会话一一对应) */
+import { MOCK_CONVERSATION_LIST } from '../data/mockConversations'
+
+const MOCK_CONVERSATIONS_FALLBACK = MOCK_CONVERSATION_LIST
 
 function Sidebar() {
   const location = useLocation()

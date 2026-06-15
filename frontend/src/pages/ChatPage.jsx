@@ -17,9 +17,41 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import ChatInput from '../components/ChatInput'
-import useMessages from '../hooks/useMessages'
+import useMessages, { getConversationMeta, getConversationMessages } from '../hooks/useMessages'
 import useSkills from '../hooks/useSkills'
 import useCustomAgents from '../hooks/useCustomAgents'
+import useAgentProcess from '../hooks/useAgentProcess'
+import AgentOutputMessage from '../components/chat/AgentOutputMessage'
+import AgentProcessPanel from '../components/chat/AgentProcessPanel'
+import BlinkingCaret from '../components/chat/BlinkingCaret'
+
+/* 系统消息组件(智能体加载、工具调用完成等系统级提示) */
+function SystemMessage({ message }) {
+  const isAgentSystem = message.type === 'agent_system'
+  return (
+    <div className="self-center select-none">
+      <div
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px]"
+        style={{
+          backgroundColor: isAgentSystem
+            ? 'color-mix(in srgb, var(--color-primary) 10%, transparent)'
+            : 'var(--color-surface-container)',
+          color: isAgentSystem
+            ? 'var(--color-primary)'
+            : 'var(--color-on-surface-variant)',
+          border: isAgentSystem
+            ? '1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)'
+            : '1px solid var(--color-outline-variant)',
+        }}
+      >
+        <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>
+          {isAgentSystem ? 'smart_toy' : 'info'}
+        </span>
+        <span>{message.content}</span>
+      </div>
+    </div>
+  )
+}
 
 /* 用户消息组件 */
 function UserMessage({ message }) {
@@ -420,16 +452,8 @@ function RenderBlock({ block, codeBlocks, imageUrl }) {
   return null
 }
 
-/* 闪烁光标组件 */
-function BlinkingCaret({ className = '' }) {
-  return (
-    <span
-      className={`inline-block w-1.5 h-3.5 align-middle ml-0.5 animate-pulse ${className}`}
-      style={{ backgroundColor: 'var(--color-primary)' }}
-      aria-hidden="true"
-    />
-  )
-}
+/* 闪烁光标组件 —— 重新导出(供本页面内联使用时引用) */
+export { default as BlinkingCaret } from '../components/chat/BlinkingCaret'
 
 /* 思考过程区组件：支持流式展示、自动收起、用户展开/收起（最多 10 行） */
 function ThinkingSection({ thinking, phase, isExpanded, onToggle, fullThinking }) {
@@ -904,6 +928,71 @@ export default function ChatPage() {
     (s) => s.phase === 'loading' || s.phase === 'thinking' || s.phase === 'answer'
   )
 
+  /* ========== 智能体加载状态(由 ChatInput 上报 / 由会话元数据自动加载) ========== */
+  const [loadedAgents, setLoadedAgents] = useState([])
+
+  // 读取当前会话的元数据(含 agent 信息),用于自动加载智能体
+  const convMeta = React.useMemo(() => getConversationMeta(id), [id])
+
+  // 当会话切换 / 元数据变化时:若会话预设了 agent,自动注入到 loadedAgents
+  useEffect(() => {
+    if (convMeta?.agent) {
+      setLoadedAgents([{ ...convMeta.agent, status: 'ready' }])
+    } else {
+      setLoadedAgents([])
+    }
+    // 会话切换时清空上一会话遗留的流式状态,避免新会话的旧消息触发"重新生成"动画
+    setRegenStates({})
+  }, [convMeta])
+
+  // 当前激活的智能体:已就绪 > 加载中;取最近一次加入的那一个
+  const activeAgent = React.useMemo(() => {
+    if (!loadedAgents?.length) return null
+    const ready = loadedAgents.filter((a) => a.status === 'ready' || a.status !== 'loading')
+    const target = (ready.length > 0 ? ready : loadedAgents)[loadedAgents.length - 1] || null
+    return target
+  }, [loadedAgents])
+
+  // 智能体模式:在加载了任意智能体(且非全部已移除)时启用
+  const isAgentMode = !!activeAgent
+
+  /* ========== 智能体进程/文件数据 ========== */
+  const processData = useAgentProcess({
+    agentId: activeAgent?.id,
+    agentType: activeAgent?.type,
+  })
+
+  /* ========== 智能体消息级数据快照(由 mockConversations.js 注入) ==========
+   * 优先取该消息自身携带的 agentSteps / processSnapshot / fileSnapshot,
+   * 否则回退到 useAgentProcess 的实时数据。
+   */
+  const lastAssistantMsg = React.useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === 'assistant') return messages[i]
+    }
+    return null
+  }, [messages])
+
+  const agentSnapshot = React.useMemo(() => {
+    if (!lastAssistantMsg) return null
+    const hasAgentData =
+      lastAssistantMsg.agentSteps ||
+      lastAssistantMsg.processSnapshot ||
+      lastAssistantMsg.fileSnapshot
+    if (!hasAgentData) return null
+    return {
+      steps: lastAssistantMsg.agentSteps || processData.steps,
+      process: lastAssistantMsg.processSnapshot || {
+        status: 'completed', progress: 100, currentStep: 0,
+        runtime: '0s', resources: { cpu: '0%', memory: '0 MB', network: '0 KB/s' },
+        nodes: (lastAssistantMsg.agentSteps || []).map((s) => ({
+          id: s.id, name: s.title, type: s.type, status: s.status, duration: s.duration,
+        })),
+      },
+      files: lastAssistantMsg.fileSnapshot || processData.files,
+    }
+  }, [lastAssistantMsg, processData.steps, processData.files])
+
   // 自动滚动到底部（操作按钮触发的状态更新需要抑制滚动）
   useEffect(() => {
     if (suppressAutoScrollRef.current) {
@@ -1123,77 +1212,108 @@ export default function ChatPage() {
       className="fixed top-0 left-[280px] right-0 bottom-0 flex flex-col z-0 transition-colors duration-200"
       style={{ backgroundColor: 'var(--color-background)' }}
     >
-      {/* 消息流滚动区域 - 在 fixed 主区内独立滚动；pb-40 保证最后一条消息不被底部输入条遮挡 */}
-      <div className="flex-1 overflow-y-auto pt-[80px] px-4 md:px-10 pb-40 flex flex-col items-center no-scrollbar">
-        <div className="w-full max-w-[1200px] flex flex-col gap-6">
-          {/* 日期分隔线 */}
-          {!loading && messages.length > 0 && (
-            <div className="text-center my-4">
-              <span
-                className="font-label-md text-label-md px-3 py-1"
-                style={{
-                  color: 'var(--color-outline)',
-                  backgroundColor: 'var(--color-background)',
-                }}
-              >
-                今天
-              </span>
-            </div>
-          )}
-
-          {/* 消息列表 */}
-          {loading ? (
-            /* 加载状态 - 旋转动画 */
-            <div className="flex justify-center py-12">
-              <div
-                className="animate-spin w-8 h-8 border-2 rounded-full"
-                style={{
-                  borderColor: 'var(--color-surface-variant)',
-                  borderTopColor: 'var(--color-primary)',
-                }}
-              ></div>
-            </div>
-          ) : messages.length === 0 ? (
-            /* 空状态：第一轮对话必须由用户主动发起，不显示任何 AI 问候 */
-            <div className="flex flex-col items-center justify-center py-20 gap-3 select-none" data-state="empty-first-round">
-              <div
-                className="w-14 h-14 rounded-full flex items-center justify-center"
-                style={{
-                  backgroundColor: 'var(--color-surface-container-low)',
-                  border: '1px solid var(--color-surface-variant)',
-                }}
-              >
+      {/* 主内容区:智能体模式下分两栏(左内容 + 右进程/文件浮窗);否则单栏 */}
+      <div className="flex-1 flex min-h-0">
+        {/* ====== 左侧:消息流(智能体模式下为浮窗预留右侧空间) ====== */}
+        <div
+          className="flex-1 min-w-0 overflow-y-auto pt-[80px] px-4 md:px-10 pb-40 flex flex-col items-center no-scrollbar"
+          style={isAgentMode ? { paddingRight: 'calc(420px + 40px)' } : undefined}
+        >
+          <div className="w-full max-w-[1200px] flex flex-col gap-6">
+            {/* 日期分隔线 */}
+            {!loading && messages.length > 0 && (
+              <div className="text-center my-4">
                 <span
-                  className="material-symbols-outlined text-[28px]"
+                  className="font-label-md text-label-md px-3 py-1"
                   style={{
                     color: 'var(--color-outline)',
-                    fontVariationSettings: "'FILL' 0,wght' 300",
+                    backgroundColor: 'var(--color-background)',
                   }}
                 >
-                  forum
+                  今天
                 </span>
               </div>
-              <div className="text-center">
-                <p
-                  className="font-label-md text-label-md"
-                  style={{ color: 'var(--color-on-surface-variant)' }}
-                >
-                  在下方输入框中开始第一轮对话
-                </p>
-                <p
-                  className="font-label-md text-[11px] mt-1"
-                  style={{ color: 'var(--color-outline)' }}
-                >
-                  系统不会在用户输入前发送任何消息
-                </p>
+            )}
+
+            {/* 消息列表 */}
+            {loading ? (
+              /* 加载状态 - 旋转动画 */
+              <div className="flex justify-center py-12">
+                <div
+                  className="animate-spin w-8 h-8 border-2 rounded-full"
+                  style={{
+                    borderColor: 'var(--color-surface-variant)',
+                    borderTopColor: 'var(--color-primary)',
+                  }}
+                ></div>
               </div>
-            </div>
-          ) : (
-            /* 消息列表渲染 */
-            messages.map((msg) => (
-              msg.role === 'user'
-                ? <UserMessage key={msg.id} message={msg} />
-                : <AIMessage
+            ) : messages.length === 0 ? (
+              /* 空状态：第一轮对话必须由用户主动发起，不显示任何 AI 问候 */
+              <div className="flex flex-col items-center justify-center py-20 gap-3 select-none" data-state="empty-first-round">
+                <div
+                  className="w-14 h-14 rounded-full flex items-center justify-center"
+                  style={{
+                    backgroundColor: 'var(--color-surface-container-low)',
+                    border: '1px solid var(--color-surface-variant)',
+                  }}
+                >
+                  <span
+                    className="material-symbols-outlined text-[28px]"
+                    style={{
+                      color: 'var(--color-outline)',
+                      fontVariationSettings: "'FILL' 0,wght' 300",
+                    }}
+                  >
+                    forum
+                  </span>
+                </div>
+                <div className="text-center">
+                  <p
+                    className="font-label-md text-label-md"
+                    style={{ color: 'var(--color-on-surface-variant)' }}
+                  >
+                    {isAgentMode
+                      ? `已加载「${activeAgent.name}」,请输入任务开始执行`
+                      : '在下方输入框中开始第一轮对话'}
+                  </p>
+                  <p
+                    className="font-label-md text-[11px] mt-1"
+                    style={{ color: 'var(--color-outline)' }}
+                  >
+                    {isAgentMode
+                      ? '左侧将展示执行步骤,右侧展示进程与文件'
+                      : '系统不会在用户输入前发送任何消息'}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              /* 消息列表渲染 */
+              messages.map((msg) => (
+                msg.role === 'system' ? (
+                  <SystemMessage key={msg.id} message={msg} />
+                ) : msg.role === 'user' ? (
+                  <UserMessage key={msg.id} message={msg} />
+                ) : isAgentMode && activeAgent ? (
+                  // 智能体模式 → 使用步骤化输出
+                  <AgentOutputMessage
+                    key={msg.id}
+                    message={msg}
+                    steps={msg.agentSteps || processData.steps}
+                    isThinking={regenStates[msg.id]?.phase === 'thinking'}
+                    isAnswering={regenStates[msg.id]?.phase === 'answer'}
+                    isDone={regenStates[msg.id]?.phase === 'done' || (!regenStates[msg.id] && msg.status !== 'failed')}
+                    answer={
+                      regenStates[msg.id]?.answer
+                      ?? msg.content
+                      ?? ''
+                    }
+                    onFeedback={handleFeedback}
+                    onRegenerate={handleRegenerate}
+                    beforeActionClick={beforeActionButtonClick}
+                    isBusy={['loading', 'thinking', 'answer'].includes(regenStates[msg.id]?.phase)}
+                  />
+                ) : (
+                  <AIMessage
                     key={msg.id}
                     message={msg}
                     onFeedback={handleFeedback}
@@ -1202,11 +1322,25 @@ export default function ChatPage() {
                     beforeActionClick={beforeActionButtonClick}
                     regenState={regenStates[msg.id]}
                   />
-            ))
-          )}
+                )
+              ))
+            )}
 
-          <div ref={messagesEndRef} />
+            <div ref={messagesEndRef} />
+          </div>
         </div>
+
+        {/* ====== 智能体模式 → 进程/文件浮窗(浮窗式,可展开/收起) ====== */}
+        {isAgentMode && (
+          <AgentProcessPanel
+            open
+            onClose={() => setLoadedAgents([])}
+            agent={activeAgent}
+            processData={processData}
+            snapshot={agentSnapshot}
+            defaultTab="process"
+          />
+        )}
       </div>
 
       {/* 底部输入区域 - 与消息滚动区平级，flex-shrink-0 锚定在页面底部，鼠标滚动时不会随之移动 */}
@@ -1226,6 +1360,7 @@ export default function ChatPage() {
             onStop={handleStop}
             availableSkills={enabledSkills}
             availableAgents={allAgents}
+            onLoadedAgentsChange={setLoadedAgents}
           />
 
           <div className="text-center mt-2">
