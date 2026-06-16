@@ -81,7 +81,7 @@ function Sidebar() {
               className="leading-tight"
               style={{ fontSize: '18px', fontWeight: 600, fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--color-primary)' }}
             >
-              卫星互联网运行运维智能体
+              卫星互联网<br />超级数字员工
             </span>
             <span className="text-[12px]" style={{ color: 'var(--color-on-surface-variant)' }}>Intelligent Assistant</span>
           </div>

@@ -15,7 +15,10 @@
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.61.1",
-    "@rollup/rollup-linux-x64-musl": "4.61.1"
+    "@rollup/rollup-linux-x64-musl": "4.61.1",
+    "lightningcss-linux-x64-gnu": "1.32.0",
+    "lightningcss-linux-x64-musl": "1.32.0",
+    "@esbuild/linux-x64": "0.25.12"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
