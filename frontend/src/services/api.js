@@ -3,7 +3,10 @@
  * 统一处理：基础URL、headers、响应格式、错误处理
  */
 
-const BASE_URL = '/api'
+// 优先从环境变量读取后端地址（Vite 注入），默认走相对路径（同源代理）
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
+  ? `${import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '')}/api`
+  : '/api'
 
 // 默认请求头
 function getDefaultHeaders() {
